@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <style>
+      .red { fill: #ef594a; }
+      .yellow { fill: #ecb039; }
+      .teal { fill: #40a694; }
+      .pin { fill: #53656f; }
+    </style>
+  </defs>
+
+  <!-- левый человек -->
+  <circle cx="150" cy="230" r="80" class="red"/>
+  <rect x="70" y="320" width="160" height="200" rx="40" ry="40" class="red"/>
+
+  <!-- центральный человек -->
+  <circle cx="300" cy="260" r="80" class="yellow"/>
+  <rect x="220" y="350" width="160" height="200" rx="40" ry="40" class="yellow"/>
+
+  <!-- правый человек -->
+  <circle cx="450" cy="230" r="80" class="teal"/>
+  <rect x="370" y="320" width="160" height="200" rx="40" ry="40" class="teal"/>
+
+  <!-- метка над центральным -->
+  <g>
+    <path class="pin"
+          d="M300 60
+             A110 110 0 0 0 190 170
+             C190 230 245 305 300 380
+             C355 305 410 230 410 170
+             A110 110 0 0 0 300 60Z" />
+    <circle cx="300" cy="170" r="55" fill="white"/>
+  </g>
+</svg>

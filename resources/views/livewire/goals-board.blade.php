@@ -276,6 +276,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm mb-1">Описание</label>
+                        <textarea
+                            placeholder="Подробное описание цели..."
+                            rows="3"
+                            wire:model.defer="description"
+                            class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
+                        ></textarea>
+                    </div>
+
+                    <div>
                         <label class="block text-sm mb-1">URL</label>
                         <input
                             placeholder="Может на ВБ, а может и на сайт с чем-то связанным..."

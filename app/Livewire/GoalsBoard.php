@@ -17,6 +17,7 @@ class GoalsBoard extends Component
     public ?int $editingId = null;
 
     public string $title = '';
+    public string $description = '';
     public string $url = '';
     public string $author_name = '';
     public string $target_amount = '';
@@ -53,6 +54,7 @@ class GoalsBoard extends Component
 
         $this->editingId = $goal->id;
         $this->title = $goal->title;
+        $this->description = $goal->description ?? '';
         $this->url = $goal->url ?? '';
         $this->author_name = (string) $goal->author_name;
         $this->target_amount = (string) $goal->target_amount;
@@ -67,6 +69,7 @@ class GoalsBoard extends Component
     {
         $this->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'url' => ['nullable', 'string'],
             'author_name' => ['nullable', 'string', 'max:255'],
             'target_amount' => ['nullable', 'numeric', 'min:0'],
@@ -77,6 +80,7 @@ class GoalsBoard extends Component
 
         $data = [
             'title' => $this->title,
+            'description' => $this->description ?: null,
             'url' => $this->url,
             'author_name' => $this->author_name ?: null,
             'target_amount' => $this->target_amount === '' ? 0 : (float) $this->target_amount,
@@ -139,6 +143,7 @@ class GoalsBoard extends Component
     {
         $this->editingId = null;
         $this->title = '';
+        $this->description = '';
         $this->url = '';
         $this->author_name = '';
         $this->target_amount = '';

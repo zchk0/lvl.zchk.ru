@@ -8,6 +8,7 @@ class Goal extends Model
 {
     protected $fillable = [
         'title',
+        'description',
         'url',
         'author_name',
         'target_amount',

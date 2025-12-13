@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('goals', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->text('description')->nullable();
             $table->string('url')->nullable();
             $table->string('author_name')->nullable();
             $table->decimal('target_amount', 12, 2)->default(0);

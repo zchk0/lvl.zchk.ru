@@ -9,6 +9,8 @@ use Livewire\Component;
 class GoalsBoard extends Component
 {
     public bool $showModal = false;
+    public bool $showViewModal = false;
+    public ?Goal $viewingGoal = null;
 
     // Синхронизируем с URL: ?priority=1|2|3|4|all
     #[Url(as: 'priority', except: 'all')]
@@ -46,6 +48,18 @@ class GoalsBoard extends Component
         $this->resetForm();
         $this->priority = $priority;
         $this->showModal = true;
+    }
+
+    public function openView(int $id): void
+    {
+        $this->viewingGoal = Goal::findOrFail($id);
+        $this->showViewModal = true;
+    }
+
+    public function closeViewModal(): void
+    {
+        $this->showViewModal = false;
+        $this->viewingGoal = null;
     }
 
     public function openEdit(int $id): void
@@ -130,6 +144,10 @@ class GoalsBoard extends Component
 
         if ($this->editingId === $id) {
             $this->closeModal();
+        }
+
+        if ($this->viewingGoal?->id === $id) {
+            $this->closeViewModal();
         }
     }
 

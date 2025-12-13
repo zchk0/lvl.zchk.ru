@@ -465,7 +465,7 @@
                         <div>
                             <h3 class="text-sm font-semibold text-slate-300 mb-2">Описание</h3>
                             <p class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4">
-                                {{ nl2br($viewingGoal->description) }}
+                                {!! nl2br($viewingGoal->description) !!}
                             </p>
                         </div>
                     @endif

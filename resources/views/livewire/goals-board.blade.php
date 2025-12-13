@@ -422,7 +422,7 @@
                     {{-- Заголовок и статус --}}
                     <div>
                         <div class="flex items-start justify-between gap-4 mb-2">
-                            <h2 class="text-3xl font-bold text-slate-100 {{ $viewingGoal->is_completed ? 'line-through text-slate-400' : '' }}">
+                            <h2 class="text-2xl font-bold text-slate-100 {{ $viewingGoal->is_completed ? 'line-through text-slate-400' : '' }}">
                                 {{ $viewingGoal->title }}
                             </h2>
                         </div>
@@ -476,16 +476,16 @@
                             <h3 class="text-sm font-semibold text-slate-300 mb-3">Финансы</h3>
                             <div class="bg-slate-900/50 rounded-2xl p-4 space-y-3">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-slate-400">Целевая сумма:</span>
-                                    <span class="text-lg font-semibold text-slate-100">{{ number_format($viewingGoal->target_amount, 0, ',', ' ') }} ₽</span>
+                                    <span class="text-sm text-slate-400">Целевая сумма:</span>
+                                    <span class="text-base font-semibold text-slate-100">{{ number_format($viewingGoal->target_amount, 0, ',', ' ') }} ₽</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-slate-400">Отложено:</span>
-                                    <span class="text-lg font-semibold text-emerald-400">{{ number_format($viewingGoal->saved_amount, 0, ',', ' ') }} ₽</span>
+                                    <span class="text-sm text-slate-400">Отложено / Потрачено:</span>
+                                    <span class="text-base font-semibold text-emerald-400">{{ number_format($viewingGoal->saved_amount, 0, ',', ' ') }} ₽</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-slate-400">Осталось:</span>
-                                    <span class="text-lg font-semibold text-indigo-400">{{ number_format($viewingGoal->target_amount - $viewingGoal->saved_amount, 0, ',', ' ') }} ₽</span>
+                                    <span class="text-sm text-slate-400">Осталось:</span>
+                                    <span class="text-base font-semibold text-indigo-400">{{ number_format($viewingGoal->target_amount - $viewingGoal->saved_amount, 0, ',', ' ') }} ₽</span>
                                 </div>
 
                                 <div class="pt-2">

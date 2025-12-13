@@ -64,6 +64,8 @@ class GoalsBoard extends Component
 
     public function openEdit(int $id): void
     {
+        $this->closeViewModal();
+
         $goal = Goal::findOrFail($id);
 
         $this->editingId = $goal->id;

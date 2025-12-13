@@ -76,6 +76,7 @@ class ImportGoalsCommand extends Command
 
                     $payload = [
                         'title' => $item['title'] ?? 'Без названия',
+                        'url' => $item['url'] ?? null,
                         'author_name' => $item['author_name'] ?? null,
                         'target_amount' => isset($item['target_amount']) ? (float) $item['target_amount'] : 0,
                         'saved_amount' => isset($item['saved_amount']) ? (float) $item['saved_amount'] : 0,

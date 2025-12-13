@@ -14,7 +14,7 @@
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели
+                Цели v0.24
             </h1>
 
             <div class="flex items-center gap-2 text-sm">
@@ -136,6 +136,54 @@
                     </div>
                 </div>
             @endif
+
+            {{-- Архив --}}
+            @if($visiblePriority === '4')
+                <div class="bg-slate-800 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-300">
+                                Архив
+                            </h2>
+                            <p class="text-xs text-slate-400">
+                                Что-то что уже было выполнено или на текущий момент неактуально
+                            </p>
+                        </div>
+                        <button
+                            wire:click="openCreate(4)"
+                            wire:loading.attr="disabled"
+                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-slate-400 hover:bg-slate-500 text-slate-900 disabled:opacity-60"
+                        >
+                            + Добавить
+                        </button>
+                    </div>
+
+                    @if($archive->isNotEmpty())
+                        @php
+                            $totalTarget = $archive->sum('target_amount');
+                            $totalSaved  = $archive->sum('saved_amount');
+                        @endphp
+                        <div class="text-xs text-slate-300">
+                            Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
+                            @if($totalTarget > 0)
+                                <span class="text-slate-500 ml-1">
+                                    (отложено {{ number_format($totalSaved, 0, ',', ' ') }} ₽)
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="flex flex-col gap-3">
+                        @forelse($archive as $goal)
+                            @include('partials.goal-card', ['goal' => $goal])
+                        @empty
+                            <p class="text-xs text-slate-500">
+                                Архив пуст... >_>
+                            </p>
+                        @endforelse
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -181,10 +229,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm mb-1">Автор</label>
+                        <label class="block text-sm mb-1">URL</label>
                         <input
+                            placeholder="Может на ВБ, а может и на сайт с чем-то связанным..."
                             type="text"
-                            wire:model.defer="author_name"
+                            wire:model.defer="url"
                             class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                         >
                     </div>
@@ -207,6 +256,7 @@
                         <div>
                             <label class="block text-sm mb-1">Уже отложено</label>
                             <input
+                                placeholder="Или потрачено"
                                 type="number"
                                 step="0.01"
                                 min="0"
@@ -230,6 +280,7 @@
                                 <option value="1">Высокий</option>
                                 <option value="2">Средний</option>
                                 <option value="3">Низкий</option>
+                                <option value="4">Архив</option>
                             </select>
                         </div>
                         <div class="flex items-center gap-2 mt-5">
@@ -241,6 +292,16 @@
                             >
                             <label for="is_completed" class="text-sm">Выполнено</label>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Автор</label>
+                        <input
+                            placeholder="Кто?"
+                            type="text"
+                            wire:model.defer="author_name"
+                            class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        >
                     </div>
 
                     <div class="flex gap-3 mt-4 justify-end">

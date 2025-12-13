@@ -17,6 +17,7 @@ class GoalsBoard extends Component
     public ?int $editingId = null;
 
     public string $title = '';
+    public string $url = '';
     public string $author_name = '';
     public string $target_amount = '';
     public string $saved_amount = '';
@@ -50,13 +51,14 @@ class GoalsBoard extends Component
     {
         $goal = Goal::findOrFail($id);
 
-        $this->editingId     = $goal->id;
-        $this->title         = $goal->title;
-        $this->author_name   = (string) $goal->author_name;
+        $this->editingId = $goal->id;
+        $this->title = $goal->title;
+        $this->url = $goal->url ?? '';
+        $this->author_name = (string) $goal->author_name;
         $this->target_amount = (string) $goal->target_amount;
-        $this->saved_amount  = (string) $goal->saved_amount;
-        $this->priority      = (int) $goal->priority;
-        $this->is_completed  = (bool) $goal->is_completed;
+        $this->saved_amount = (string) $goal->saved_amount;
+        $this->priority = (int) $goal->priority;
+        $this->is_completed = (bool) $goal->is_completed;
 
         $this->showModal = true;
     }
@@ -64,21 +66,23 @@ class GoalsBoard extends Component
     public function save(): void
     {
         $this->validate([
-            'title'         => ['required', 'string', 'max:255'],
-            'author_name'   => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'url' => ['nullable', 'string'],
+            'author_name' => ['nullable', 'string', 'max:255'],
             'target_amount' => ['nullable', 'numeric', 'min:0'],
-            'saved_amount'  => ['nullable', 'numeric', 'min:0'],
-            'priority'      => ['required', 'integer', 'in:1,2,3'],
-            'is_completed'  => ['boolean'],
+            'saved_amount' => ['nullable', 'numeric', 'min:0'],
+            'priority' => ['required', 'integer', 'in:1,2,3,4'],
+            'is_completed' => ['boolean'],
         ]);
 
         $data = [
-            'title'         => $this->title,
-            'author_name'   => $this->author_name ?: null,
+            'title' => $this->title,
+            'url' => $this->url,
+            'author_name' => $this->author_name ?: null,
             'target_amount' => $this->target_amount === '' ? 0 : (float) $this->target_amount,
-            'saved_amount'  => $this->saved_amount === '' ? 0 : (float) $this->saved_amount,
-            'priority'      => $this->priority,
-            'is_completed'  => $this->is_completed,
+            'saved_amount' => $this->saved_amount === '' ? 0 : (float) $this->saved_amount,
+            'priority' => $this->priority,
+            'is_completed' => $this->is_completed,
         ];
 
         if ($this->editingId) {
@@ -133,12 +137,13 @@ class GoalsBoard extends Component
 
     private function resetForm(): void
     {
-        $this->editingId     = null;
-        $this->title         = '';
-        $this->author_name   = '';
+        $this->editingId = null;
+        $this->title = '';
+        $this->url = '';
+        $this->author_name = '';
         $this->target_amount = '';
-        $this->saved_amount  = '';
-        $this->priority      = 2;
-        $this->is_completed  = false;
+        $this->saved_amount = '';
+        $this->priority = 2;
+        $this->is_completed = false;
     }
 }

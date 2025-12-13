@@ -10,9 +10,15 @@
         </div>
     </div>
 
+    @php
+        $isAll = $visiblePriority === 'all';
+        $colsClass = $isAll ? 'md:grid-cols-3' : 'md:grid-cols-1';
+        $widthClass = $isAll ? 'max-w-6xl' : 'max-w-3xl mx-auto';
+    @endphp
+
     <div class="max-w-6xl mx-auto px-4">
         {{-- Заголовок + селект фильтра --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
                 Цели v0.24
             </h1>
@@ -32,12 +38,8 @@
             </div>
         </div>
 
-        @php
-            $colsClass = $visiblePriority === 'all' ? 'md:grid-cols-3' : 'md:grid-cols-1';
-        @endphp
-
         {{-- КОЛОНКИ (или одна, если выбран фильтр) --}}
-        <div class="grid gap-6 {{ $colsClass }}">
+        <div class="grid gap-6 {{ "$colsClass $widthClass" }}">
             {{-- Высокий приоритет --}}
             @if($visiblePriority === 'all' || $visiblePriority === '1')
                 <div class="bg-slate-800 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
@@ -58,6 +60,21 @@
                             + Добавить
                         </button>
                     </div>
+
+                    @if($highGoals->isNotEmpty())
+                        @php
+                            $totalTarget = $highGoals->sum('target_amount');
+                            $totalSaved  = $highGoals->sum('saved_amount');
+                        @endphp
+                        <div class="text-xs text-slate-300">
+                            Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
+                            @if($totalTarget > 0)
+                                <span class="text-slate-500 ml-1">
+                                    (отложено {{ number_format($totalSaved, 0, ',', ' ') }} ₽)
+                                </span>
+                            @endif
+                        </div>
+                    @endif
 
                     <div class="flex flex-col gap-3">
                         @forelse($highGoals as $goal)
@@ -92,6 +109,21 @@
                         </button>
                     </div>
 
+                    @if($mediumGoals->isNotEmpty())
+                        @php
+                            $totalTarget = $mediumGoals->sum('target_amount');
+                            $totalSaved  = $mediumGoals->sum('saved_amount');
+                        @endphp
+                        <div class="text-xs text-slate-300">
+                            Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
+                            @if($totalTarget > 0)
+                                <span class="text-slate-500 ml-1">
+                                    (отложено {{ number_format($totalSaved, 0, ',', ' ') }} ₽)
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="flex flex-col gap-3">
                         @forelse($mediumGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal])
@@ -124,6 +156,21 @@
                             + Добавить
                         </button>
                     </div>
+
+                    @if($lowGoals->isNotEmpty())
+                        @php
+                            $totalTarget = $lowGoals->sum('target_amount');
+                            $totalSaved  = $lowGoals->sum('saved_amount');
+                        @endphp
+                        <div class="text-xs text-slate-300">
+                            Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
+                            @if($totalTarget > 0)
+                                <span class="text-slate-500 ml-1">
+                                    (отложено {{ number_format($totalSaved, 0, ',', ' ') }} ₽)
+                                </span>
+                            @endif
+                        </div>
+                    @endif
 
                     <div class="flex flex-col gap-3">
                         @forelse($lowGoals as $goal)

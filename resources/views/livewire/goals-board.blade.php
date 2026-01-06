@@ -237,6 +237,7 @@
     {{-- МОДАЛКА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ --}}
     @if($showModal)
         <div
+            data-modal-open="true"
             class="fixed inset-0 z-40 flex items-center justify-center bg-black/60"
             wire:keydown.escape="closeModal"
         >
@@ -399,6 +400,7 @@
     {{-- МОДАЛКА ПРОСМОТРА --}}
     @if($showViewModal && $viewingGoal)
         <div
+            data-modal-open="true"
             class="fixed inset-0 z-40 flex items-center justify-center bg-black/60"
             wire:keydown.escape="closeViewModal"
         >

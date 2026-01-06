@@ -22,7 +22,7 @@
 
     <div class="text-xs text-slate-400 flex justify-between">
         @if(!empty($goal->target_amount))<span>Цель: {{ number_format($goal->target_amount, 0, ',', ' ') }} ₽</span>@endif
-        <span>Отложено: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>
+        @if(!empty($goal->saved_amount))<span>Отложено: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>@endif
     </div>
 
     @if(!empty($goal->target_amount))

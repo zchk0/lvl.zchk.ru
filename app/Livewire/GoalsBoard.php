@@ -46,13 +46,10 @@ class GoalsBoard extends Component
         // Поиск по карточкам
         $term = trim($this->search);
         if ($term !== '') {
-            $like = '%' . $term . '%';
-
+            $like = '%' . mb_strtolower($term) . '%';
             $query->where(function ($q) use ($like) {
-                $q->where('title', 'like', $like)
-                  ->orWhere('description', 'like', $like)
-                  ->orWhere('author_name', 'like', $like)
-                  ->orWhere('url', 'like', $like);
+                $q->whereRaw('LOWER(title) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$like]);
             });
         }
 

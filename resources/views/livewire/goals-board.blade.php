@@ -11,6 +11,7 @@
         $isAll = $visiblePriority === 'all';
         $colsClass = $isAll ? 'md:grid-cols-3' : 'md:grid-cols-1';
         $widthClass = $isAll ? 'max-w-6xl' : 'max-w-3xl mx-auto';
+        $isSearch = mb_strlen(trim($search)) > 0;
     @endphp
 
     <div class="max-w-6xl mx-auto px-4">
@@ -57,7 +58,7 @@
         {{-- КОЛОНКИ (или одна, если выбран фильтр) --}}
         <div class="grid gap-6 {{ "$colsClass $widthClass" }}">
             {{-- Высокий приоритет --}}
-            @if($visiblePriority === 'all' || $visiblePriority === '1')
+            @if(($visiblePriority === 'all' || $visiblePriority === '1') && !($isSearch && $highGoals->isEmpty()))
                 <div class="bg-slate-800 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
                     <div class="flex items-center justify-between gap-2">
                         <div>
@@ -104,7 +105,7 @@
             @endif
 
             {{-- Средний приоритет --}}
-            @if($visiblePriority === 'all' || $visiblePriority === '2')
+            @if(($visiblePriority === 'all' || $visiblePriority === '2') && !($isSearch && $mediumGoals->isEmpty()))
                 <div class="bg-slate-800 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
                     <div class="flex items-center justify-between gap-2">
                         <div>
@@ -151,7 +152,7 @@
             @endif
 
             {{-- Низкий приоритет --}}
-            @if($visiblePriority === 'all' || $visiblePriority === '3')
+            @if(($visiblePriority === 'all' || $visiblePriority === '3') && !($isSearch && $lowGoals->isEmpty()))
                 <div class="bg-slate-800 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
                     <div class="flex items-center justify-between gap-2">
                         <div>

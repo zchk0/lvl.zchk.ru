@@ -2,8 +2,7 @@
     {{-- Глобальный индикатор загрузки Livewire --}}
     <div
         wire:loading.delay
-        class="fixed inset-x-0 top-4 z-40 flex justify-center pointer-events-none"
-    >
+        class="fixed inset-x-0 top-4 z-40 flex justify-center pointer-events-none">
         <div class="px-4 py-2 rounded-full bg-slate-800/95 border border-slate-700 shadow-lg flex items-center gap-2 text-xs text-slate-200">
             <span class="w-3 h-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></span>
             <span>Синхронизация изменений…</span>
@@ -20,21 +19,40 @@
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.30
+                Цели v0.31
             </h1>
 
-            <div class="flex items-center gap-2 text-sm">
-                <span class="text-slate-400 hidden sm:inline">Отображать:</span>
-                <select
-                    wire:model.live="visiblePriority"
-                    class="rounded-2xl bg-slate-800 border border-slate-600 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                >
-                    <option value="all">Все приоритеты</option>
-                    <option value="1">Только высокий</option>
-                    <option value="2">Только средний</option>
-                    <option value="3">Только низкий</option>
-                    <option value="4">Архив</option>
-                </select>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm w-full sm:w-auto">
+                {{-- Поиск --}}
+                <div class="relative w-full sm:w-72">
+                    <input
+                        type="search"
+                        wire:model.live.debounce.300ms="search"
+                        placeholder="Поиск по целям…"
+                        class="w-full rounded-2xl bg-slate-800 border border-slate-600 pl-3 pr-10 py-1.5 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
+                        [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden" />
+                    @if($search !== '')
+                        <button
+                            type="button"
+                            wire:click="$set('search','')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                            title="Очистить">
+                            ✕
+                        </button>
+                    @endif
+                </div>
+                {{-- Фильтр приоритета --}}
+                <div class="flex items-center gap-2">
+                    <select
+                        wire:model.live="visiblePriority"
+                        class="rounded-2xl bg-slate-800 border border-slate-600 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        <option value="all">Все приоритеты</option>
+                        <option value="1">Только высокий</option>
+                        <option value="2">Только средний</option>
+                        <option value="3">Только низкий</option>
+                        <option value="4">Архив</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -55,8 +73,7 @@
                         <button
                             wire:click="openCreate(1)"
                             wire:loading.attr="disabled"
-                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-red-500 hover:bg-red-600 text-white disabled:opacity-60"
-                        >
+                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-red-500 hover:bg-red-600 text-white disabled:opacity-60">
                             + Добавить
                         </button>
                     </div>
@@ -64,7 +81,7 @@
                     @if($highGoals->isNotEmpty())
                         @php
                             $totalTarget = $highGoals->sum('target_amount');
-                            $totalSaved  = $highGoals->sum('saved_amount');
+                            $totalSaved = $highGoals->sum('saved_amount');
                         @endphp
                         <div class="text-xs text-slate-300">
                             Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
@@ -79,7 +96,7 @@
                     <div class="flex flex-col gap-3">
                         @forelse($highGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal])
-                        @empty
+                            @empty
                             <p class="text-xs text-slate-500">
                                 Пока ничего нет. Добавь первую цель.
                             </p>
@@ -103,8 +120,7 @@
                         <button
                             wire:click="openCreate(2)"
                             wire:loading.attr="disabled"
-                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-amber-400 hover:bg-amber-500 text-slate-900 disabled:opacity-60"
-                        >
+                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-amber-400 hover:bg-amber-500 text-slate-900 disabled:opacity-60">
                             + Добавить
                         </button>
                     </div>
@@ -112,7 +128,7 @@
                     @if($mediumGoals->isNotEmpty())
                         @php
                             $totalTarget = $mediumGoals->sum('target_amount');
-                            $totalSaved  = $mediumGoals->sum('saved_amount');
+                            $totalSaved = $mediumGoals->sum('saved_amount');
                         @endphp
                         <div class="text-xs text-slate-300">
                             Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
@@ -127,7 +143,7 @@
                     <div class="flex flex-col gap-3">
                         @forelse($mediumGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal])
-                        @empty
+                            @empty
                             <p class="text-xs text-slate-500">
                                 Пока пусто.
                             </p>
@@ -151,8 +167,7 @@
                         <button
                             wire:click="openCreate(3)"
                             wire:loading.attr="disabled"
-                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-emerald-400 hover:bg-emerald-500 text-slate-900 disabled:opacity-60"
-                        >
+                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-emerald-400 hover:bg-emerald-500 text-slate-900 disabled:opacity-60">
                             + Добавить
                         </button>
                     </div>
@@ -160,7 +175,7 @@
                     @if($lowGoals->isNotEmpty())
                         @php
                             $totalTarget = $lowGoals->sum('target_amount');
-                            $totalSaved  = $lowGoals->sum('saved_amount');
+                            $totalSaved = $lowGoals->sum('saved_amount');
                         @endphp
                         <div class="text-xs text-slate-300">
                             Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
@@ -175,7 +190,7 @@
                     <div class="flex flex-col gap-3">
                         @forelse($lowGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal])
-                        @empty
+                            @empty
                             <p class="text-xs text-slate-500">
                                 Здесь можно складывать долгосрочные мечты.
                             </p>
@@ -199,8 +214,7 @@
                         <button
                             wire:click="openCreate(4)"
                             wire:loading.attr="disabled"
-                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-slate-400 hover:bg-slate-500 text-slate-900 disabled:opacity-60"
-                        >
+                            class="px-3 py-1 rounded-2xl text-xs font-semibold bg-slate-400 hover:bg-slate-500 text-slate-900 disabled:opacity-60">
                             + Добавить
                         </button>
                     </div>
@@ -208,7 +222,7 @@
                     @if($archive->isNotEmpty())
                         @php
                             $totalTarget = $archive->sum('target_amount');
-                            $totalSaved  = $archive->sum('saved_amount');
+                            $totalSaved = $archive->sum('saved_amount');
                         @endphp
                         <div class="text-xs text-slate-300">
                             Итого: {{ number_format($totalTarget, 0, ',', ' ') }} ₽
@@ -223,7 +237,7 @@
                     <div class="flex flex-col gap-3">
                         @forelse($archive as $goal)
                             @include('partials.goal-card', ['goal' => $goal])
-                        @empty
+                            @empty
                             <p class="text-xs text-slate-500">
                                 Архив пуст... >_>
                             </p>

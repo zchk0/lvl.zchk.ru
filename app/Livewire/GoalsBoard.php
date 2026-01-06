@@ -16,6 +16,10 @@ class GoalsBoard extends Component
     #[Url(as: 'priority', except: 'all')]
     public string $visiblePriority = 'all';
 
+    // Поиск
+    #[Url(as: 'q', except: '')]
+    public string $search = '';
+
     public ?int $editingId = null;
 
     public string $title = '';
@@ -29,11 +33,30 @@ class GoalsBoard extends Component
 
     public function render()
     {
-        $goals = Goal::orderBy('priority')
+        $query = Goal::query()
+            ->orderBy('priority')
             ->orderBy('position')
-            ->orderBy('id')
-            ->get()
-            ->groupBy('priority');
+            ->orderBy('id');
+
+        // Фильтр по выбранной колонке (если не all)
+        if ($this->visiblePriority !== 'all') {
+            $query->where('priority', (int) $this->visiblePriority);
+        }
+
+        // Поиск по карточкам
+        $term = trim($this->search);
+        if ($term !== '') {
+            $like = '%' . $term . '%';
+
+            $query->where(function ($q) use ($like) {
+                $q->where('title', 'like', $like)
+                  ->orWhere('description', 'like', $like)
+                  ->orWhere('author_name', 'like', $like)
+                  ->orWhere('url', 'like', $like);
+            });
+        }
+
+        $goals = $query->get()->groupBy('priority');
 
         return view('livewire.goals-board', [
             'highGoals' => $goals[1] ?? collect(),

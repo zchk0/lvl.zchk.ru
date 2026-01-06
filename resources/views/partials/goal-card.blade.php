@@ -107,7 +107,7 @@
                     hover:bg-indigo-500/30 hover:border-indigo-300
                     focus:outline-none focus:ring-2 focus:ring-indigo-400/60
                     transition">
-            <span>Открыть ссылку</span>
+            <span>Ссылка</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M14 3h7m0 0v7m0-7L10 14" />

@@ -1,8 +1,6 @@
 <div class="min-h-screen bg-slate-900 text-slate-100 py-10">
     {{-- Глобальный индикатор загрузки Livewire --}}
-    <div
-        wire:loading.delay
-        class="fixed inset-x-0 top-4 z-40 flex justify-center pointer-events-none">
+    <div class="fixed inset-x-0 top-4 z-40 flex justify-center pointer-events-none opacity-0" wire:loading.delay.class="opacity-100">
         <div class="px-4 py-2 rounded-full bg-slate-800/95 border border-slate-700 shadow-lg flex items-center gap-2 text-xs text-slate-200">
             <span class="w-3 h-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></span>
             <span>Синхронизация изменений…</span>
@@ -19,19 +17,19 @@
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.31
+                Цели v0.32
             </h1>
 
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm w-full sm:w-auto">
                 {{-- Поиск --}}
                 <div class="relative w-full sm:w-72">
                     <input
                         type="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Поиск по целям…"
-                        class="w-full rounded-2xl bg-slate-800 border border-slate-600 pl-3 pr-10 py-1.5 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
+                        class="w-full rounded-2xl bg-slate-800 border border-slate-600 pl-3 pr-10 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
                         [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden" />
-                    @if($search !== '')
+                    @if(trim($search) !== '')
                         <button
                             type="button"
                             wire:click="$set('search','')"
@@ -45,7 +43,7 @@
                 <div class="flex items-center gap-2">
                     <select
                         wire:model.live="visiblePriority"
-                        class="rounded-2xl bg-slate-800 border border-slate-600 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        class="rounded-2xl bg-slate-800 border border-slate-600 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         <option value="all">Все приоритеты</option>
                         <option value="1">Только высокий</option>
                         <option value="2">Только средний</option>

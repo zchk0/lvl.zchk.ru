@@ -137,6 +137,7 @@ class GoalsBoard extends Component
     {
         $goal = Goal::findOrFail($id);
         $goal->is_completed = ! $goal->is_completed;
+        $goal->saved_amount = $goal->is_completed ? (int)$goal->target_amount : 0;
         $goal->save();
     }
 

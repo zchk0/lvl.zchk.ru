@@ -1,4 +1,4 @@
-<div class="rounded-2xl bg-slate-900/70 border border-slate-700 px-3 py-3 text-sm flex flex-col gap-2">
+<div class="rounded-2xl {{ $goal->is_completed ? 'opacity-65' : '' }} bg-slate-900/70 border border-slate-700 px-3 py-3 text-sm flex flex-col gap-2">
     <div class="flex items-start justify-between gap-2">
         <div>
             <button
@@ -21,8 +21,8 @@
     </div>
 
     <div class="text-xs text-slate-400 flex justify-between">
-        @if(!empty($goal->target_amount))<span>Цель: {{ number_format($goal->target_amount, 0, ',', ' ') }} ₽</span>@endif
-        @if(!empty($goal->saved_amount))<span>Отложено: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>@endif
+        @if(!empty($goal->target_amount && !$goal->is_completed))<span>Цель: {{ number_format($goal->target_amount, 0, ',', ' ') }} ₽</span>@endif
+        @if(!empty($goal->saved_amount))<span>Достигнуто: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>@endif
     </div>
 
     @if(!empty($goal->target_amount))

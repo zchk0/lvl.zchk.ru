@@ -70,7 +70,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm mb-1">Уже отложено</label>
+                        <label class="block text-sm mb-1">Достигнуто</label>
                         <input
                             placeholder="Или потрачено"
                             type="number"
@@ -109,7 +109,7 @@
                     x-transition.opacity.duration.150ms
                     class="mt-2 rounded-2xl border border-slate-700 bg-slate-900/60 p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="text-sm font-medium">Отложено</div>
+                        <div class="text-sm font-medium">Прогресс</div>
                         <div class="text-xs text-slate-300">
                             <span class="font-semibold" x-text="v"></span>
                             <span class="text-slate-500"> / </span>
@@ -126,11 +126,6 @@
                         x-model.number="value"
                         @input="clamp()"
                         :style="`--pct:${pct}%`">
-
-                    <div class="flex items-center justify-between mt-2 text-[11px] text-slate-500">
-                        <span>0</span>
-                        <span x-text="t"></span>
-                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">

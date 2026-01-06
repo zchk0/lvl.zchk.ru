@@ -80,7 +80,7 @@
                             <span class="text-base font-semibold text-slate-100">{{ number_format($viewingGoal->target_amount, 0, ',', ' ') }} ₽</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-sm text-slate-400">Отложено / Потрачено:</span>
+                            <span class="text-sm text-slate-400">Достигнуто:</span>
                             <span class="text-base font-semibold text-emerald-400">{{ number_format($viewingGoal->saved_amount, 0, ',', ' ') }} ₽</span>
                         </div>
                         <div class="flex justify-between items-center">

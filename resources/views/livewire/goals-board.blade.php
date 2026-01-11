@@ -12,9 +12,10 @@
         $colsClass = $isAll ? 'md:grid-cols-3' : 'md:grid-cols-1';
         $widthClass = $isAll ? 'max-w-6xl' : 'max-w-3xl mx-auto';
         $isSearch = mb_strlen(trim($search)) > 0;
+        $dragEnabled = ! $isSearch;
     @endphp
 
-    <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
@@ -92,9 +93,9 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3" data-goals-column data-priority="1">
                         @forelse($highGoals as $goal)
-                            @include('partials.goal-card', ['goal' => $goal])
+                            @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
                             <p class="text-xs text-slate-500">
                                 Пока ничего нет. Добавь первую цель.
@@ -139,9 +140,9 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3" data-goals-column data-priority="2">
                         @forelse($mediumGoals as $goal)
-                            @include('partials.goal-card', ['goal' => $goal])
+                            @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
                             <p class="text-xs text-slate-500">
                                 Пока пусто.
@@ -186,9 +187,9 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3" data-goals-column data-priority="3">
                         @forelse($lowGoals as $goal)
-                            @include('partials.goal-card', ['goal' => $goal])
+                            @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
                             <p class="text-xs text-slate-500">
                                 Здесь можно складывать долгосрочные мечты.
@@ -233,9 +234,9 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3" data-goals-column data-priority="4">
                         @forelse($archive as $goal)
-                            @include('partials.goal-card', ['goal' => $goal])
+                            @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
                             <p class="text-xs text-slate-500">
                                 Архив пуст... >_>

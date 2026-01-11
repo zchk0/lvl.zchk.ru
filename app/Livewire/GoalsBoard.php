@@ -153,6 +153,44 @@ class GoalsBoard extends Component
         $goal->save();
     }
 
+    public function syncGoalOrder(array $columns): void
+    {
+        $normalized = [];
+
+        foreach ($columns as $column) {
+            if (!is_array($column)) {
+                continue;
+            }
+
+            $priority = isset($column['priority']) ? (int) $column['priority'] : null;
+            if (!in_array($priority, [1, 2, 3, 4], true)) {
+                continue;
+            }
+
+            $ids = $column['ids'] ?? [];
+            if (!is_array($ids)) {
+                continue;
+            }
+
+            $ids = array_values(array_filter(array_map('intval', $ids), static fn ($id) => $id > 0));
+
+            $normalized[$priority] = $ids;
+        }
+
+        if ($normalized === []) {
+            return;
+        }
+
+        foreach ($normalized as $priority => $ids) {
+            foreach ($ids as $index => $id) {
+                Goal::whereKey($id)->update([
+                    'priority' => $priority,
+                    'position' => $index + 1,
+                ]);
+            }
+        }
+    }
+
     public function toggleCompleted(int $id): void
     {
         $goal = Goal::findOrFail($id);

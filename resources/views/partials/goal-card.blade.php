@@ -1,4 +1,12 @@
-<div class="rounded-2xl {{ $goal->is_completed ? 'opacity-65' : '' }} bg-slate-900/70 border border-slate-700 px-3 py-3 text-sm flex flex-col gap-2">
+@php
+    $dragEnabled = $dragEnabled ?? true;
+@endphp
+<div
+    class="rounded-2xl {{ $goal->is_completed ? 'opacity-65' : '' }} bg-slate-900/70 border border-slate-700 px-3 py-3 text-sm flex flex-col gap-2 {{ $dragEnabled ? 'cursor-grab active:cursor-grabbing' : '' }}"
+    wire:key="goal-{{ $goal->id }}"
+    data-goal-card
+    data-goal-id="{{ $goal->id }}"
+    draggable="{{ $dragEnabled ? 'true' : 'false' }}">
     <div class="flex items-start justify-between gap-2">
         <div>
             <button

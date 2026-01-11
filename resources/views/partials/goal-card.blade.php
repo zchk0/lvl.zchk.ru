@@ -20,12 +20,38 @@
             </div>
             @endif
         </div>
+        <div class="flex flex-col items-end gap-2">
         <button
             wire:click="toggleCompleted({{ $goal->id }})"
             class="text-xs px-2 py-1 rounded-xl border
                 {{ $goal->is_completed ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
             {{ $goal->is_completed ? 'Готово' : 'Завершить' }}
         </button>
+        <div class="flex items-center gap-1">
+            <button
+                type="button"
+                wire:click="moveWithinPriority({{ $goal->id }}, 'up')"
+                class="px-2 py-1 rounded-lg text-xs bg-slate-800 border border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Move up"
+                aria-label="Move up"
+                {{ $dragEnabled ? '' : 'disabled' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+            </button>
+            <button
+                type="button"
+                wire:click="moveWithinPriority({{ $goal->id }}, 'down')"
+                class="px-2 py-1 rounded-lg text-xs bg-slate-800 border border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Move down"
+                aria-label="Move down"
+                {{ $dragEnabled ? '' : 'disabled' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+        </div>
     </div>
 
     <div class="text-xs text-slate-400 flex justify-between">

@@ -191,6 +191,49 @@ class GoalsBoard extends Component
         }
     }
 
+    public function moveWithinPriority(int $id, string $direction): void
+    {
+        $direction = strtolower($direction);
+        if (!in_array($direction, ['up', 'down'], true)) {
+            return;
+        }
+
+        if (trim($this->search) !== '') {
+            return;
+        }
+
+        $goal = Goal::find($id);
+        if (! $goal) {
+            return;
+        }
+
+        $ids = Goal::where('priority', $goal->priority)
+            ->orderBy('position')
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($goalId) => (int) $goalId)
+            ->all();
+
+        $index = array_search($goal->id, $ids, true);
+        if ($index === false) {
+            return;
+        }
+
+        $swapIndex = $direction === 'up' ? $index - 1 : $index + 1;
+        if ($swapIndex < 0 || $swapIndex >= count($ids)) {
+            return;
+        }
+
+        [$ids[$index], $ids[$swapIndex]] = [$ids[$swapIndex], $ids[$index]];
+
+        $this->syncGoalOrder([
+            [
+                'priority' => $goal->priority,
+                'ids' => $ids,
+            ],
+        ]);
+    }
+
     public function toggleCompleted(int $id): void
     {
         $goal = Goal::findOrFail($id);

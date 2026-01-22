@@ -290,7 +290,7 @@ class GoalsBoard extends Component
     private function generatePublicToken(): string
     {
         do {
-            $token = Str::random(40);
+            $token = Str::random();
         } while (Goal::where('public_token', $token)->exists());
 
         return $token;

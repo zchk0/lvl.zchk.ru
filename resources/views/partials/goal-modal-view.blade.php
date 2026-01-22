@@ -57,6 +57,24 @@
                                     default => ''
                                 } }}
                         </span>
+                        <button
+                            type="button"
+                            wire:click="togglePublic({{ $viewingGoal->id }})"
+                            aria-pressed="{{ $viewingGoal->is_public ? 'true' : 'false' }}"
+                            class="text-xs px-3 py-1 rounded-full border inline-flex items-center gap-1
+                                {{ $viewingGoal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
+                            <span class="w-2 h-2 rounded-full {{ $viewingGoal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
+                            {{ $viewingGoal->is_public ? 'Публичная' : 'Частная' }}
+                        </button>
+                        @if($viewingGoal->is_public && $viewingGoal->public_token)
+                        <a
+                            href="{{ route('goals.share', $viewingGoal->public_token) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-xs px-3 py-1 rounded-full border border-indigo-400/70 text-indigo-100 bg-indigo-500/15 hover:bg-indigo-500/30 hover:border-indigo-300 transition">
+                            Ссылка
+                        </a>
+                        @endif
                     </div>
                 </div>
 

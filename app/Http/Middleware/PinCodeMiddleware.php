@@ -19,6 +19,7 @@ class PinCodeMiddleware
         $except = [
             'pin',
             'pin/check',
+            'share/*',
         ];
 
         // Не проверяем PIN для этих путей, иначе будет бесконечный редирект

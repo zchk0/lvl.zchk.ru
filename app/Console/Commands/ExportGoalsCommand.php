@@ -54,6 +54,8 @@ class ExportGoalsCommand extends Command
                 'saved_amount' => (float) $goal->saved_amount,
                 'priority' => (int) $goal->priority,
                 'is_completed' => (bool) $goal->is_completed,
+                'is_public' => (bool) $goal->is_public,
+                'public_token' => $goal->public_token,
                 'position' => (int) $goal->position,
             ];
         })->all();

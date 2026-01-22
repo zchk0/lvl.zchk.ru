@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Goal;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -242,6 +243,18 @@ class GoalsBoard extends Component
         $goal->save();
     }
 
+    public function togglePublic(int $id): void
+    {
+        $goal = Goal::findOrFail($id);
+        $goal->is_public = ! $goal->is_public;
+
+        if ($goal->is_public && empty($goal->public_token)) {
+            $goal->public_token = $this->generatePublicToken();
+        }
+
+        $goal->save();
+    }
+
     public function delete(int $id): void
     {
         Goal::whereKey($id)->delete();
@@ -272,5 +285,14 @@ class GoalsBoard extends Component
         $this->saved_amount = '';
         $this->priority = 2;
         $this->is_completed = false;
+    }
+
+    private function generatePublicToken(): string
+    {
+        do {
+            $token = Str::random(40);
+        } while (Goal::where('public_token', $token)->exists());
+
+        return $token;
     }
 }

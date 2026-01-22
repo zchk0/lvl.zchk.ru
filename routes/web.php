@@ -1,11 +1,22 @@
 <?php
 
+use App\Models\Goal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/share/{token}', function (string $token) {
+    $goal = Goal::query()
+        ->where('public_token', $token)
+        ->where('is_public', true)
+        ->firstOrFail();
+    return view('goal-public', [
+        'goal' => $goal,
+    ]);
+})->where('token', '[A-Za-z0-9]+')->name('goals.share');
 
 Route::get('/pin', function () {
     return view('pin');

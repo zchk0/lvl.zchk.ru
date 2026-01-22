@@ -83,6 +83,8 @@ class ImportGoalsCommand extends Command
                         'saved_amount' => isset($item['saved_amount']) ? (float) $item['saved_amount'] : 0,
                         'priority' => isset($item['priority']) ? (int) $item['priority'] : 2,
                         'is_completed' => isset($item['is_completed']) ? (bool) $item['is_completed'] : false,
+                        'is_public' => isset($item['is_public']) ? (bool) $item['is_public'] : false,
+                        'public_token' => isset($item['public_token']) && $item['public_token'] !== '' ? $item['public_token'] : null,
                         'position' => isset($item['position']) ? (int) $item['position'] : 0,
                     ];
 

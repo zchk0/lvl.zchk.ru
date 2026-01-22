@@ -15,6 +15,8 @@ class Goal extends Model
         'saved_amount',
         'priority',
         'is_completed',
+        'is_public',
+        'public_token',
         'position',
     ];
 

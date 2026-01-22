@@ -22,6 +22,8 @@ return new class extends Migration
             $table->tinyInteger('priority')->default(2); // 1-высокий, 2-средний, 3-низкий, 4-архив
             $table->boolean('is_completed')->default(false);
             $table->unsignedInteger('position')->default(0); // порядок внутри колонки
+            $table->boolean('is_public')->default(false);
+            $table->string('public_token', 80)->nullable()->unique();
             $table->timestamps();
         });
     }

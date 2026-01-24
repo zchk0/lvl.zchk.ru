@@ -21,7 +21,7 @@
             <div class="space-y-6">
                 {{-- Заголовок и статус --}}
                 <div>
-                    <div class="flex items-start justify-between gap-4 mb-2">
+                    <div class="flex items-start justify-between gap-4 mb-3">
                         <h2 class="text-2xl font-bold text-slate-100 {{ $viewingGoal->is_completed ? 'line-through text-slate-400' : '' }}">
                             {{ $viewingGoal->title }}
                         </h2>
@@ -31,17 +31,17 @@
                     <p class="text-sm text-slate-400 italic">Автор: {{ $viewingGoal->author_name }}</p>
                     @endif
 
-                    <div class="mt-2 flex items-center gap-2">
+                    <div class="mt-2 flex flex-wrap items-center gap-2">
                         @if($viewingGoal->is_completed)
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 border border-emerald-400 text-emerald-200">
+                        <span class="px-3 py-1 rounded-full text-[11px] bg-emerald-500/20 border border-emerald-400 text-emerald-200">
                             ✓ Выполнено
                         </span>
                         @else
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-600/50 border border-slate-500 text-slate-200">
+                        <span class="px-3 py-1 rounded-full text-[11px] bg-slate-600/50 border border-slate-500 text-slate-200">
                             В процессе
                         </span>
                         @endif
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
+                        <span class="px-3 py-1 rounded-full text-[11px] whitespace-nowrap
                                 {{ match($viewingGoal->priority) {
                                     1 => 'bg-red-500/20 border border-red-400 text-red-200',
                                     2 => 'bg-amber-500/20 border border-amber-400 text-amber-200',
@@ -57,25 +57,39 @@
                                     default => ''
                                 } }}
                         </span>
-                        <button
+                        <span
                             type="button"
-                            wire:click="togglePublic({{ $viewingGoal->id }})"
-                            aria-pressed="{{ $viewingGoal->is_public ? 'true' : 'false' }}"
-                            class="text-xs px-3 py-1 rounded-full border inline-flex items-center gap-1
+                            class="text-[11px] px-3 py-1 rounded-full border inline-flex items-center gap-1
                                 {{ $viewingGoal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
                             <span class="w-2 h-2 rounded-full {{ $viewingGoal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
                             {{ $viewingGoal->is_public ? 'Публичная' : 'Частная' }}
-                        </button>
-                        @if($viewingGoal->is_public && $viewingGoal->public_token)
-                        <a
-                            href="{{ route('goals.share', $viewingGoal->public_token) }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-xs px-3 py-1 rounded-full border border-indigo-400/70 text-indigo-100 bg-indigo-500/15 hover:bg-indigo-500/30 hover:border-indigo-300 transition">
-                            Ссылка
-                        </a>
-                        @endif
+                        </span>
                     </div>
+                    @if($viewingGoal->is_public && $viewingGoal->public_token)
+                        <div class="mt-3 flex items-center gap-2">
+                            <input
+                                type="text"
+                                readonly
+                                value="{{ route('goals.share', $viewingGoal->public_token) }}"
+                                onclick="this.select(); this.setSelectionRange(0, this.value.length); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(this.value); }"
+                                onfocus="this.select();"
+                                class="w-[65%] text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/10 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 cursor-pointer"
+                                aria-label="Ссылка для копирования">
+                            <a
+                                href="{{ route('goals.share', $viewingGoal->public_token) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Перейти по ссылке"
+                                class="text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/15 hover:bg-indigo-500/30 hover:border-indigo-300 transition inline-flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 3h7m0 0v7m0-7L10 14" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 5v14h14" />
+                                </svg>
+                            </a>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Описание --}}

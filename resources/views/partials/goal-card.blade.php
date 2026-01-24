@@ -1,5 +1,5 @@
 @php
-    $dragEnabled = $dragEnabled ?? true;
+$dragEnabled = $dragEnabled ?? true;
 @endphp
 <div
     class="rounded-2xl {{ $goal->is_completed ? 'opacity-65' : '' }} bg-slate-900/70 border border-slate-700 px-3 py-3 text-sm flex flex-col gap-2 {{ $dragEnabled ? 'cursor-grab active:cursor-grabbing' : '' }}"
@@ -21,20 +21,12 @@
             @endif
         </div>
         <div class="flex flex-col items-end gap-2">
-        <button
-            wire:click="toggleCompleted({{ $goal->id }})"
-            class="text-xs px-2 py-1 rounded-xl border
+            <button
+                wire:click="toggleCompleted({{ $goal->id }})"
+                class="text-xs px-2 py-1 rounded-xl border
                 {{ $goal->is_completed ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
-            {{ $goal->is_completed ? 'Готово' : 'Завершить' }}
-        </button>
-        <button
-            type="button"
-            wire:click="togglePublic({{ $goal->id }})"
-            aria-pressed="{{ $goal->is_public ? 'true' : 'false' }}"
-            class="text-[10px] px-2 py-1 rounded-full border inline-flex items-center gap-1
-                {{ $goal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
-            <span class="w-2 h-2 rounded-full {{ $goal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
-        </button>
+                {{ $goal->is_completed ? 'Готово' : 'Завершить' }}
+            </button>
         </div>
     </div>
 
@@ -137,6 +129,14 @@
                 </div>
             </div>
         </details>
+        <button
+            type="button"
+            wire:click="togglePublic({{ $goal->id }})"
+            aria-pressed="{{ $goal->is_public ? 'true' : 'false' }}"
+            class="absolute top-[2px] left-[100px] text-[10px] px-2 py-2 rounded-full border inline-flex items-center gap-1
+                    {{ $goal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
+            <span class="w-2 h-2 rounded-full {{ $goal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
+        </button>
 
         @if(!empty($goal->url))
         <a

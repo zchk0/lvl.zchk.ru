@@ -133,7 +133,7 @@ $dragEnabled = $dragEnabled ?? true;
             type="button"
             wire:click="togglePublic({{ $goal->id }})"
             aria-pressed="{{ $goal->is_public ? 'true' : 'false' }}"
-            class="absolute top-[2px] left-[100px] text-[10px] px-2 py-2 rounded-full border inline-flex items-center gap-1
+            class="absolute top-[2px] left-[98px] text-[10px] px-2 py-2 rounded-full border inline-flex items-center gap-1
                     {{ $goal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
             <span class="w-2 h-2 rounded-full {{ $goal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
         </button>

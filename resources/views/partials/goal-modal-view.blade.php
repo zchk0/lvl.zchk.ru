@@ -28,10 +28,10 @@
                     </div>
 
                     @if($viewingGoal->author_name)
-                    <p class="text-sm text-slate-400 italic">Автор: {{ $viewingGoal->author_name }}</p>
+                        <p class="text-sm text-slate-400 italic">Автор: {{ $viewingGoal->author_name }}</p>
                     @endif
 
-                    <div class="mt-2 flex flex-wrap items-center gap-2">
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
                         @if($viewingGoal->is_completed)
                         <span class="px-3 py-1 rounded-full text-[11px] bg-emerald-500/20 border border-emerald-400 text-emerald-200">
                             ✓ Выполнено

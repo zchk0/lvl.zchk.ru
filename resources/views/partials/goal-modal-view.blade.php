@@ -27,9 +27,14 @@
                         </h2>
                     </div>
 
-                    @if($viewingGoal->author_name)
-                        <p class="text-sm text-slate-400 italic">Автор: {{ $viewingGoal->author_name }}</p>
-                    @endif
+                    <p class="text-sm text-slate-400 italic">
+                        @if($viewingGoal->author_name)
+                            <span>Автор: {{ $viewingGoal->author_name }} | </span>
+                        @endif
+                        @if($viewingGoal->created_at)
+                            {{ $viewingGoal->created_at->format('d.m.Y') }} ({{ (int) $viewingGoal->created_at->diffInDays(now()) }} дн. назад)
+                        @endif
+                    </p>
 
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         @if($viewingGoal->is_completed)
@@ -66,29 +71,29 @@
                         </span>
                     </div>
                     @if($viewingGoal->is_public && $viewingGoal->public_token)
-                        <div class="mt-3 flex items-center gap-2">
-                            <input
-                                type="text"
-                                readonly
-                                value="{{ route('goals.share', $viewingGoal->public_token) }}"
-                                onclick="this.select(); this.setSelectionRange(0, this.value.length); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(this.value); }"
-                                onfocus="this.select();"
-                                class="w-[65%] text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/10 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 cursor-pointer"
-                                aria-label="Ссылка для копирования">
-                            <a
-                                href="{{ route('goals.share', $viewingGoal->public_token) }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="Перейти по ссылке"
-                                class="text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/15 hover:bg-indigo-500/30 hover:border-indigo-300 transition inline-flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 3h7m0 0v7m0-7L10 14" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 5v14h14" />
-                                </svg>
-                            </a>
-                        </div>
+                    <div class="mt-3 flex items-center gap-2">
+                        <input
+                            type="text"
+                            readonly
+                            value="{{ route('goals.share', $viewingGoal->public_token) }}"
+                            onclick="this.select(); this.setSelectionRange(0, this.value.length); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(this.value); }"
+                            onfocus="this.select();"
+                            class="w-[65%] text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/10 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 cursor-pointer"
+                            aria-label="Ссылка для копирования">
+                        <a
+                            href="{{ route('goals.share', $viewingGoal->public_token) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Перейти по ссылке"
+                            class="text-xs px-3 py-2 rounded-xl border border-indigo-400/70 text-indigo-100 bg-indigo-500/15 hover:bg-indigo-500/30 hover:border-indigo-300 transition inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 3h7m0 0v7m0-7L10 14" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 5v14h14" />
+                            </svg>
+                        </a>
+                    </div>
                     @endif
                 </div>
 

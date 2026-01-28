@@ -86,6 +86,7 @@ class ImportGoalsCommand extends Command
                         'is_public' => isset($item['is_public']) ? (bool) $item['is_public'] : false,
                         'public_token' => isset($item['public_token']) && $item['public_token'] !== '' ? $item['public_token'] : null,
                         'position' => isset($item['position']) ? (int) $item['position'] : 0,
+                        'created_at' => isset($item['created_at']) ? $item['created_at'] : null,
                     ];
 
                     Goal::create($payload);

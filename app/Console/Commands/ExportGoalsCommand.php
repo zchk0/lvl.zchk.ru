@@ -57,6 +57,7 @@ class ExportGoalsCommand extends Command
                 'is_public' => (bool) $goal->is_public,
                 'public_token' => $goal->public_token,
                 'position' => (int) $goal->position,
+                'created_at' => $goal->created_at,
             ];
         })->all();
 

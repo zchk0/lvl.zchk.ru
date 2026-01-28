@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Goal;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -130,10 +131,15 @@ class GoalsBoard extends Component
             $goal = Goal::findOrFail($this->editingId);
             $goal->update($data);
         } else {
-            $maxPosition = Goal::where('priority', $data['priority'])->max('position') ?? 0;
-            $data['position'] = $maxPosition + 1;
+            DB::transaction(function () use ($data) {
+                // Сдвигаем все позиции вниз внутри priority
+                // Новая карточка становится первой
+                Goal::where('priority', $data['priority'])
+                    ->increment('position');
+                $data['position'] = 1;
 
-            Goal::create($data);
+                Goal::create($data);
+            });
         }
 
         $this->closeModal();

@@ -70,6 +70,15 @@ $dragEnabled = $dragEnabled ?? true;
                     class="px-2 py-1 rounded-xl bg-red-500/20 border border-red-500 text-red-300 text-xs">
                     Удалить
                 </button>
+                <button
+                    type="button"
+                    wire:click="moveToTopWithinPriority({{ $goal->id }})"
+                    class="hidden sm:inline-flex px-2 py-1 rounded-xl text-xs bg-slate-800 border border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Наверх"
+                    aria-label="Наверх"
+                    {{ $dragEnabled ? '' : 'disabled' }}>
+                    Наверх
+                </button>
 
                 <div class="flex items-center gap-1 sm:hidden">
                     <button

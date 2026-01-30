@@ -77,7 +77,7 @@ $dragEnabled = $dragEnabled ?? true;
                     title="Наверх"
                     aria-label="Наверх"
                     {{ $dragEnabled ? '' : 'disabled' }}>
-                    Наверх
+                    Наверх ↑
                 </button>
 
                 <div class="flex items-center gap-1 sm:hidden">
@@ -106,7 +106,7 @@ $dragEnabled = $dragEnabled ?? true;
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400 pl-1 w-full">
-                    <span class="w-full py-1">Переместить в:</span>
+                    <span class="w-full py-1">Изменить приоритет:</span>
                     @if($goal->priority !== 1)
                     <button
                         wire:click="moveToPriority({{ $goal->id }}, 1)"

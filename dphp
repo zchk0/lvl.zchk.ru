@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Универсальный вызов PHP/Artisan внутри Docker (локал/прод)
+# Примеры:
+#   ./dphp artisan migrate
+#   ./dphp artisan goals:import --truncate
+#   ./dphp composer install
+#
+# Принудительно:
+#   ENV=local ./dphp artisan tinker
+#   ENV=prod  ./dphp artisan migrate --force
+
+set -euo pipefail
+
+SERVICE="${SERVICE:-app}"
+
+# 1) Принудительный выбор
+if [[ "${ENV:-}" == "local" ]]; then
+  COMPOSE_FILE="docker-compose.local.yml"
+elif [[ "${ENV:-}" == "prod" || "${ENV:-}" == "production" ]]; then
+  COMPOSE_FILE="docker-compose.yml"
+else
+  # 2) Авто-детект: если локальный compose существует и сервис app в нём запущен
+  if [[ -f docker-compose.local.yml ]] && docker compose -f docker-compose.local.yml ps --services --status running 2>/dev/null | grep -qx "$SERVICE"; then
+    COMPOSE_FILE="docker-compose.local.yml"
+  else
+    COMPOSE_FILE="docker-compose.yml"
+  fi
+fi
+
+# Проверка файла
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+  echo "❌ Compose file not found: $COMPOSE_FILE"
+  exit 1
+fi
+
+# Если хочешь видеть, что выбралось — раскомментируй:
+# echo "Using compose: $COMPOSE_FILE (service: $SERVICE)" >&2
+docker compose -f "$COMPOSE_FILE" exec "$SERVICE" php "$@"
+

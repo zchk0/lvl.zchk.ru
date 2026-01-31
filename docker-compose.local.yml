@@ -28,8 +28,6 @@ services:
       BCRYPT_ROUNDS: "12"
     volumes:
       - ./:/var/www/html
-      - lvl_storage_local:/var/www/html/storage
-      - lvl_db_local:/var/www/html/database
     restart: unless-stopped
 
   scheduler:
@@ -46,7 +44,6 @@ services:
     volumes:
       - ./:/var/www/html
       - lvl_storage_local:/var/www/html/storage
-      - lvl_db_local:/var/www/html/database
     depends_on:
       - app
     restart: unless-stopped
@@ -65,4 +62,3 @@ services:
 
 volumes:
   lvl_storage_local:
-  lvl_db_local:

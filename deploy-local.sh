@@ -50,17 +50,8 @@ fi
 echo "[3/8] Запустим локально контейнеры"
 dc up -d
 
-echo "[4/8] Ensuring Laravel writable dirs exist (storage/framework/* etc.)..."
-exec_app_root "
-  mkdir -p \
-    bootstrap/cache \
-    storage/framework/views \
-    storage/framework/cache/data \
-    storage/framework/sessions \
-    storage/framework/testing \
-    storage/logs &&
-  chmod -R 777 storage bootstrap/cache storage/logs
-"
+echo "[4/8] Изменим доступы к директориям на которые обычно жалуется laravel..."
+# exec_app_root "chmod -R 777 storage bootstrap/cache storage/logs storage/framework"
 
 echo "[5/8] Ensuring composer dependencies..."
 exec_app_host '

@@ -9,6 +9,9 @@ set -euo pipefail
 #
 # Остановить:
 #   docker compose -f docker-compose.local.yml down
+# Лог cron контейнера:
+#   docker compose -f docker-compose.local.yml logs -f --tail=200 scheduler
+
 
 COMPOSE_FILE="docker-compose.local.yml"
 HOST_UID="$(id -u)"

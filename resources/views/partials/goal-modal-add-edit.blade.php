@@ -89,17 +89,17 @@
                     x-data="{
                         target: $wire.entangle('target_amount'),
                         value:  $wire.entangle('saved_amount'),
-                        get t() { return Math.max(0, parseInt(this.target || 0)); },
-                        get v() { return Math.max(0, parseInt(this.value  || 0)); },
+                        get t() { return Math.max(0, parseFloat(this.target || 0)); },
+                        get v() { return Math.max(0, parseFloat(this.value  || 0)); },
+                        get maxRange() { return Math.max(this.t, this.v, 1); },
                         get pct() {
                             if (!this.t) return 0;
                             return Math.min(100, Math.max(0, (this.v / this.t) * 100));
                         },
                         clamp() {
-                            let v = parseInt(this.value ?? 0);
+                            let v = parseFloat(this.value ?? 0);
                             if (isNaN(v)) v = 0;
                             if (v < 0) v = 0;
-                            if (this.t > 0 && v > this.t) v = this.t;
                             this.value = v;
                         }
                     }"
@@ -121,7 +121,7 @@
                         type="range"
                         class="goal-range w-full"
                         min="0"
-                        :max="t"
+                        :max="maxRange"
                         step="1"
                         x-model.number="value"
                         @input="clamp()"

@@ -11,7 +11,9 @@
         $isAll = $visiblePriority === 'all';
         $colsClass = $isAll ? 'md:grid-cols-3' : 'md:grid-cols-1';
         $widthClass = $isAll ? 'max-w-6xl' : 'max-w-4xl mx-auto';
-        $columnModeClass = $isAll ? 'flex flex-col gap-3' : 'grid grid-cols-1 md:grid-cols-2 gap-3';
+        $columnModeClass = $isAll
+            ? 'flex flex-col gap-3'
+            : 'grid grid-cols-1 md:grid-cols-2 md:grid-flow-col gap-3 md:[grid-template-rows:repeat(var(--goal-rows),minmax(0,max-content))]';
         $isSearch = mb_strlen(trim($search)) > 0;
         $dragEnabled = ! $isSearch;
     @endphp
@@ -94,7 +96,14 @@
                         </div>
                     @endif
 
-                    <div class="{{ $columnModeClass }}" data-goals-column data-priority="1">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="1"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($highGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($highGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -141,7 +150,14 @@
                         </div>
                     @endif
 
-                    <div class="{{ $columnModeClass }}" data-goals-column data-priority="2">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="2"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($mediumGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($mediumGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -188,7 +204,14 @@
                         </div>
                     @endif
 
-                    <div class="{{ $columnModeClass }}" data-goals-column data-priority="3">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="3"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($lowGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($lowGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -235,7 +258,14 @@
                         </div>
                     @endif
 
-                    <div class="{{ $columnModeClass }}" data-goals-column data-priority="4">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="4"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($archive->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($archive as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty

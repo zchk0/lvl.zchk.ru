@@ -307,10 +307,14 @@ class GoalsBoard extends Component
         $newSubgoalId = null;
 
         $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($subgoalId, $normalizedTitle, &$newSubgoalId): array {
-            foreach ($subgoals as &$subgoal) {
+            $currentIndex = null;
+
+            foreach ($subgoals as $index => &$subgoal) {
                 if (($subgoal['id'] ?? '') !== $subgoalId) {
                     continue;
                 }
+
+                $currentIndex = $index;
 
                 if ($normalizedTitle !== '') {
                     $subgoal['title'] = $normalizedTitle;
@@ -320,12 +324,18 @@ class GoalsBoard extends Component
             unset($subgoal);
 
             $newSubgoalId = $this->makeSubgoalId();
-            $subgoals[] = [
+            $newSubgoal = [
                 'id' => $newSubgoalId,
                 'title' => 'Новая подзадача',
                 'is_done' => false,
-                'position' => count($subgoals) + 1,
+                'position' => 0,
             ];
+
+            if (is_int($currentIndex) && $currentIndex >= 0) {
+                array_splice($subgoals, $currentIndex + 1, 0, [$newSubgoal]);
+            } else {
+                $subgoals[] = $newSubgoal;
+            }
 
             return $subgoals;
         });

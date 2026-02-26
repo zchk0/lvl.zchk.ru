@@ -271,6 +271,57 @@
             box-shadow: 0 12px 25px rgba(249, 115, 22, 0.2);
         }
 
+        .subgoals-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .subgoals-item {
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .subgoals-item:last-child {
+            border-bottom: 0;
+        }
+
+        .subgoals-marker {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+            background: transparent;
+        }
+
+        .subgoals-item.is-done .subgoals-marker {
+            color: #ecfeff;
+            background: rgba(52, 211, 153, 0.75);
+            border-color: rgba(52, 211, 153, 0.85);
+        }
+
+        .subgoals-title {
+            line-height: 1.4;
+        }
+
+        .subgoals-item.is-done .subgoals-title {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
         .footer {
             text-align: center;
             color: var(--muted);
@@ -337,6 +388,10 @@
             4 => 'Архив',
             default => 'Без приоритета',
         };
+        $subgoals = collect($goal->subgoals ?? [])
+            ->sortBy('position')
+            ->values();
+        $doneSubgoals = $subgoals->where('is_done', true)->count();
     @endphp
 
     <main class="page">
@@ -358,6 +413,27 @@
             <section class="panel">
                 <h2>Описание</h2>
                 <p>{!! nl2br(e($goal->description)) !!}</p>
+            </section>
+        @endif
+
+        @if($subgoals->isNotEmpty())
+            <section class="panel">
+                <div class="progress-header">
+                    <h2>Подзадачи</h2>
+                    <span class="percent">{{ $doneSubgoals }}/{{ $subgoals->count() }}</span>
+                </div>
+                <ul class="subgoals-list">
+                    @foreach($subgoals as $subgoal)
+                        @php
+                            $isDone = (bool) ($subgoal['is_done'] ?? false);
+                            $title = (string) ($subgoal['title'] ?? 'Подзадача');
+                        @endphp
+                        <li class="subgoals-item {{ $isDone ? 'is-done' : '' }}">
+                            <span class="subgoals-marker" aria-hidden="true">{{ $isDone ? '✓' : '' }}</span>
+                            <span class="subgoals-title">{{ $title }}</span>
+                        </li>
+                    @endforeach
+                </ul>
             </section>
         @endif
 

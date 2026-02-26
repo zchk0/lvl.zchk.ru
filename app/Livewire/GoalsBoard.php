@@ -466,6 +466,10 @@ class GoalsBoard extends Component
         }
 
         $goal->save();
+
+        if ($this->viewingGoal?->id === $goal->id) {
+            $this->viewingGoal = $goal->fresh();
+        }
     }
 
     public function delete(int $id): void

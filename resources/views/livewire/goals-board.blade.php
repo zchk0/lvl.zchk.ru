@@ -22,7 +22,7 @@
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.43
+                Цели v0.44
             </h1>
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm w-full sm:w-auto">

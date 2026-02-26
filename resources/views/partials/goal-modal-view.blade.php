@@ -62,13 +62,15 @@
                                     default => ''
                                 } }}
                         </span>
-                        <span
+                        <button
                             type="button"
+                            wire:click="togglePublic({{ $viewingGoal->id }})"
+                            aria-pressed="{{ $viewingGoal->is_public ? 'true' : 'false' }}"
                             class="text-[11px] px-3 py-1 rounded-full border inline-flex items-center gap-1
                                 {{ $viewingGoal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
                             <span class="w-2 h-2 rounded-full {{ $viewingGoal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
                             {{ $viewingGoal->is_public ? 'Публичная' : 'Частная' }}
-                        </span>
+                        </button>
                     </div>
                     @if($viewingGoal->is_public && $viewingGoal->public_token)
                     <div class="mt-3 flex items-center gap-2">

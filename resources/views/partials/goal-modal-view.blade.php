@@ -191,7 +191,7 @@
                         wire:click="addSubgoal({{ $viewingGoal->id }})"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-500 text-slate-100 hover:bg-slate-700/50 transition">
                         <span class="text-lg leading-none">+</span>
-                        <span class="text-sm font-medium">Добавить подзадачу</span>
+                        <span class="text-xs font-medium">Подзадача</span>
                     </button>
                 </div>
 

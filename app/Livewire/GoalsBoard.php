@@ -326,7 +326,7 @@ class GoalsBoard extends Component
             $newSubgoalId = $this->makeSubgoalId();
             $newSubgoal = [
                 'id' => $newSubgoalId,
-                'title' => 'Новая подзадача',
+                'title' => 'Новая подзадача...',
                 'is_done' => false,
                 'position' => 0,
             ];

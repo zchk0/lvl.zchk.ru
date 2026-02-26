@@ -9,7 +9,7 @@
     {{-- центрирование + отступы --}}
     <div class="relative flex min-h-[100dvh] items-center justify-center p-4">
         <div
-            class="relative z-50 w-full max-w-lg bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
+            class="relative z-50 w-full max-w-xl bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
             style="max-height: calc(100dvh - 2rem - env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch;">
             <button
                 type="button"

@@ -510,7 +510,7 @@ class GoalsBoard extends Component
             return;
         }
 
-        $goal->subgoals = $this->normalizeSubgoals($updatedSubgoals);
+        $goal->subgoals = $this->normalizeSubgoals($updatedSubgoals, false);
         $goal->save();
 
         if ($this->viewingGoal?->id === $goal->id) {
@@ -518,7 +518,7 @@ class GoalsBoard extends Component
         }
     }
 
-    private function normalizeSubgoals(mixed $subgoals): array
+    private function normalizeSubgoals(mixed $subgoals, bool $sortByPosition = true): array
     {
         if (!is_array($subgoals)) {
             return [];
@@ -538,14 +538,16 @@ class GoalsBoard extends Component
             $normalized[] = $normalizedItem;
         }
 
-        usort($normalized, static function (array $a, array $b): int {
-            $positionCmp = ($a['position'] ?? 0) <=> ($b['position'] ?? 0);
-            if ($positionCmp !== 0) {
-                return $positionCmp;
-            }
+        if ($sortByPosition) {
+            usort($normalized, static function (array $a, array $b): int {
+                $positionCmp = ($a['position'] ?? 0) <=> ($b['position'] ?? 0);
+                if ($positionCmp !== 0) {
+                    return $positionCmp;
+                }
 
-            return strcmp((string) ($a['id'] ?? ''), (string) ($b['id'] ?? ''));
-        });
+                return strcmp((string) ($a['id'] ?? ''), (string) ($b['id'] ?? ''));
+            });
+        }
 
         foreach ($normalized as $index => &$item) {
             $item['position'] = $index + 1;

@@ -107,6 +107,83 @@
                 </div>
                 @endif
 
+                {{-- Подзадачи --}}
+                @php
+                    $subgoals = collect($viewingGoal->subgoals ?? [])
+                        ->sortBy('position')
+                        ->values();
+                    $completedSubgoals = $subgoals->where('is_done', true)->count();
+                @endphp
+                <div
+                    data-subgoals-board
+                    data-goal-id="{{ $viewingGoal->id }}"
+                    class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-300">
+                        Подзадачи {{ $completedSubgoals }}/{{ $subgoals->count() }}
+                    </h3>
+
+                    <div
+                        data-subgoals-list
+                        class="rounded-2xl border border-slate-700 bg-slate-900/40 divide-y divide-slate-700">
+                        @forelse($subgoals as $subgoal)
+                            @php
+                                $subgoalId = (string) ($subgoal['id'] ?? '');
+                                $isDone = (bool) ($subgoal['is_done'] ?? false);
+                                $title = (string) ($subgoal['title'] ?? 'Новая подзадача');
+                            @endphp
+                            <div
+                                data-subgoal-item
+                                data-subgoal-id="{{ $subgoalId }}"
+                                draggable="true"
+                                class="group flex items-center gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
+                                <span
+                                    data-subgoal-drag-handle
+                                    draggable="true"
+                                    class="select-none text-slate-500 hover:text-slate-300 px-1 py-1 rounded cursor-grab active:cursor-grabbing"
+                                    title="Перетащить">
+                                    &#8942;&#8942;
+                                </span>
+                                <button
+                                    type="button"
+                                    wire:click="toggleSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}')"
+                                    class="w-6 h-6 shrink-0 rounded-full border inline-flex items-center justify-center transition
+                                        {{ $isDone ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-500 text-transparent hover:border-slate-300 hover:text-slate-300' }}"
+                                    title="Переключить статус">
+                                    &#10003;
+                                </button>
+
+                                <input
+                                    type="text"
+                                    value="{{ $title }}"
+                                    @keydown.enter.prevent="$el.blur()"
+                                    @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
+                                    class="flex-1 min-w-0 bg-transparent text-sm px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    aria-label="Название подзадачи">
+
+                                <button
+                                    type="button"
+                                    wire:click="deleteSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}')"
+                                    class="w-7 h-7 shrink-0 rounded-lg text-slate-500 hover:text-rose-300 hover:bg-rose-500/10 transition"
+                                    title="Удалить подзадачу">
+                                    &times;
+                                </button>
+                            </div>
+                        @empty
+                            <div class="px-3 py-3 text-xs text-slate-500">
+                                Пока нет подзадач
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="addSubgoal({{ $viewingGoal->id }})"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-500 text-slate-100 hover:bg-slate-700/50 transition">
+                        <span class="text-lg leading-none">+</span>
+                        <span class="text-sm font-medium">Добавить подзадачу</span>
+                    </button>
+                </div>
+
                 {{-- Финансовая информация --}}
                 @if($viewingGoal->target_amount > 0)
                 <div>

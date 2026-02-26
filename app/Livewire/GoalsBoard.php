@@ -275,6 +275,123 @@ class GoalsBoard extends Component
         ]);
     }
 
+    public function addSubgoal(int $goalId): void
+    {
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals): array {
+            $subgoals[] = [
+                'id' => $this->makeSubgoalId(),
+                'title' => 'Новая подзадача',
+                'is_done' => false,
+                'position' => count($subgoals) + 1,
+            ];
+
+            return $subgoals;
+        });
+    }
+
+    public function toggleSubgoal(int $goalId, string $subgoalId): void
+    {
+        $subgoalId = trim($subgoalId);
+        if ($subgoalId === '') {
+            return;
+        }
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($subgoalId): array {
+            foreach ($subgoals as &$subgoal) {
+                if (($subgoal['id'] ?? '') === $subgoalId) {
+                    $subgoal['is_done'] = !((bool) ($subgoal['is_done'] ?? false));
+                    break;
+                }
+            }
+            unset($subgoal);
+
+            return $subgoals;
+        });
+    }
+
+    public function renameSubgoal(int $goalId, string $subgoalId, string $title): void
+    {
+        $subgoalId = trim($subgoalId);
+        if ($subgoalId === '') {
+            return;
+        }
+
+        $normalizedTitle = trim((string) preg_replace('/\s+/u', ' ', $title));
+        if ($normalizedTitle === '') {
+            return;
+        }
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($subgoalId, $normalizedTitle): array {
+            foreach ($subgoals as &$subgoal) {
+                if (($subgoal['id'] ?? '') === $subgoalId) {
+                    $subgoal['title'] = $normalizedTitle;
+                    break;
+                }
+            }
+            unset($subgoal);
+
+            return $subgoals;
+        });
+    }
+
+    public function deleteSubgoal(int $goalId, string $subgoalId): void
+    {
+        $subgoalId = trim($subgoalId);
+        if ($subgoalId === '') {
+            return;
+        }
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($subgoalId): array {
+            return array_values(array_filter(
+                $subgoals,
+                static fn (array $subgoal): bool => ($subgoal['id'] ?? '') !== $subgoalId
+            ));
+        });
+    }
+
+    public function reorderSubgoals(int $goalId, array $orderedIds): void
+    {
+        $orderedIds = array_values(array_unique(array_filter(
+            array_map(static function ($id): string {
+                return is_scalar($id) ? trim((string) $id) : '';
+            }, $orderedIds),
+            static fn (string $id): bool => $id !== ''
+        )));
+
+        if ($orderedIds === []) {
+            return;
+        }
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($orderedIds): array {
+            $subgoalsById = [];
+            foreach ($subgoals as $subgoal) {
+                $subgoalsById[$subgoal['id']] = $subgoal;
+            }
+
+            $reordered = [];
+            foreach ($orderedIds as $id) {
+                if (!isset($subgoalsById[$id])) {
+                    continue;
+                }
+
+                $reordered[] = $subgoalsById[$id];
+                unset($subgoalsById[$id]);
+            }
+
+            foreach ($subgoals as $subgoal) {
+                $id = $subgoal['id'];
+                if (!isset($subgoalsById[$id])) {
+                    continue;
+                }
+
+                $reordered[] = $subgoal;
+                unset($subgoalsById[$id]);
+            }
+
+            return $reordered;
+        });
+    }
+
     public function toggleCompleted(int $id): void
     {
         $goal = Goal::findOrFail($id);
@@ -325,6 +442,93 @@ class GoalsBoard extends Component
         $this->saved_amount = '';
         $this->priority = 2;
         $this->is_completed = false;
+    }
+
+    private function updateSubgoalsForGoal(int $goalId, callable $mutator): void
+    {
+        $goal = Goal::findOrFail($goalId);
+        $subgoals = $this->normalizeSubgoals($goal->subgoals);
+        $updatedSubgoals = $mutator($subgoals);
+
+        if (!is_array($updatedSubgoals)) {
+            return;
+        }
+
+        $goal->subgoals = $this->normalizeSubgoals($updatedSubgoals);
+        $goal->save();
+
+        if ($this->viewingGoal?->id === $goal->id) {
+            $this->viewingGoal = $goal->fresh();
+        }
+    }
+
+    private function normalizeSubgoals(mixed $subgoals): array
+    {
+        if (!is_array($subgoals)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($subgoals as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $normalizedItem = $this->normalizeSubgoalItem($item, $index + 1);
+            if ($normalizedItem === null) {
+                continue;
+            }
+
+            $normalized[] = $normalizedItem;
+        }
+
+        usort($normalized, static function (array $a, array $b): int {
+            $positionCmp = ($a['position'] ?? 0) <=> ($b['position'] ?? 0);
+            if ($positionCmp !== 0) {
+                return $positionCmp;
+            }
+
+            return strcmp((string) ($a['id'] ?? ''), (string) ($b['id'] ?? ''));
+        });
+
+        foreach ($normalized as $index => &$item) {
+            $item['position'] = $index + 1;
+        }
+        unset($item);
+
+        return array_values($normalized);
+    }
+
+    private function normalizeSubgoalItem(array $item, int $fallbackPosition): ?array
+    {
+        $title = trim((string) preg_replace('/\s+/u', ' ', (string) ($item['title'] ?? '')));
+        if ($title === '') {
+            $title = 'Новая подзадача';
+        }
+
+        $id = isset($item['id']) && is_scalar($item['id'])
+            ? trim((string) $item['id'])
+            : '';
+        if ($id === '') {
+            $id = $this->makeSubgoalId();
+        }
+
+        $position = isset($item['position']) ? (int) $item['position'] : $fallbackPosition;
+        if ($position <= 0) {
+            $position = $fallbackPosition;
+        }
+
+        return [
+            'id' => $id,
+            'title' => $title,
+            'is_done' => (bool) ($item['is_done'] ?? false),
+            'position' => $position,
+        ];
+    }
+
+    private function makeSubgoalId(): string
+    {
+        return (string) Str::ulid();
     }
 
     private function generatePublicToken(): string

@@ -49,6 +49,7 @@ class ExportGoalsCommand extends Command
                 'title' => $goal->title,
                 'url' => $goal->url,
                 'description' => $goal->description ?? '',
+                'subgoals' => is_array($goal->subgoals) ? $goal->subgoals : [],
                 'author_name' => $goal->author_name,
                 'target_amount' => (float) $goal->target_amount,
                 'saved_amount' => (float) $goal->saved_amount,

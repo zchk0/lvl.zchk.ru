@@ -9,6 +9,7 @@ class Goal extends Model
     protected $fillable = [
         'title',
         'description',
+        'subgoals',
         'url',
         'author_name',
         'target_amount',
@@ -18,6 +19,16 @@ class Goal extends Model
         'is_public',
         'public_token',
         'position',
+    ];
+
+    protected $casts = [
+        'subgoals' => 'array',
+        'target_amount' => 'decimal:2',
+        'saved_amount' => 'decimal:2',
+        'is_completed' => 'boolean',
+        'is_public' => 'boolean',
+        'priority' => 'integer',
+        'position' => 'integer',
     ];
 
     // Акцессор прогресса в процентах

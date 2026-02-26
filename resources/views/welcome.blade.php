@@ -23,5 +23,6 @@
     @livewireScripts
     <script src="{{ asset('js/modal-scroll-lock.js') }}" defer></script>
     <script src="{{ asset('js/goal-dnd.js') }}" defer></script>
+    <script src="{{ asset('js/subgoal-dnd.js') }}" defer></script>
 </body>
 </html>

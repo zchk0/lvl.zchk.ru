@@ -117,6 +117,17 @@
                 <div
                     data-subgoals-board
                     data-goal-id="{{ $viewingGoal->id }}"
+                    x-data="{}"
+                    x-on:subgoal-created.window="
+                        if (Number($event.detail.goalId) !== Number($el.dataset.goalId)) return;
+                        requestAnimationFrame(() => {
+                            const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] input[type=&quot;text&quot;]';
+                            const input = $el.querySelector(selector);
+                            if (!input) return;
+                            input.focus();
+                            input.select();
+                        });
+                    "
                     class="space-y-3">
                     <h3 class="text-sm font-semibold text-slate-300">
                         Подзадачи {{ $completedSubgoals }}/{{ $subgoals->count() }}
@@ -155,7 +166,7 @@
                                 <input
                                     type="text"
                                     value="{{ $title }}"
-                                    @keydown.enter.prevent="$el.blur()"
+                                    @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     class="flex-1 min-w-0 bg-transparent text-sm px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
                                     aria-label="Название подзадачи">

@@ -277,9 +277,12 @@ class GoalsBoard extends Component
 
     public function addSubgoal(int $goalId): void
     {
-        $this->updateSubgoalsForGoal($goalId, function (array $subgoals): array {
+        $newSubgoalId = null;
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use (&$newSubgoalId): array {
+            $newSubgoalId = $this->makeSubgoalId();
             $subgoals[] = [
-                'id' => $this->makeSubgoalId(),
+                'id' => $newSubgoalId,
                 'title' => 'Новая подзадача',
                 'is_done' => false,
                 'position' => count($subgoals) + 1,
@@ -287,6 +290,49 @@ class GoalsBoard extends Component
 
             return $subgoals;
         });
+
+        if ($newSubgoalId !== null) {
+            $this->dispatch('subgoal-created', goalId: $goalId, subgoalId: $newSubgoalId);
+        }
+    }
+
+    public function saveSubgoalAndAddNext(int $goalId, string $subgoalId, string $title): void
+    {
+        $subgoalId = trim($subgoalId);
+        if ($subgoalId === '') {
+            return;
+        }
+
+        $normalizedTitle = trim((string) preg_replace('/\s+/u', ' ', $title));
+        $newSubgoalId = null;
+
+        $this->updateSubgoalsForGoal($goalId, function (array $subgoals) use ($subgoalId, $normalizedTitle, &$newSubgoalId): array {
+            foreach ($subgoals as &$subgoal) {
+                if (($subgoal['id'] ?? '') !== $subgoalId) {
+                    continue;
+                }
+
+                if ($normalizedTitle !== '') {
+                    $subgoal['title'] = $normalizedTitle;
+                }
+                break;
+            }
+            unset($subgoal);
+
+            $newSubgoalId = $this->makeSubgoalId();
+            $subgoals[] = [
+                'id' => $newSubgoalId,
+                'title' => 'Новая подзадача',
+                'is_done' => false,
+                'position' => count($subgoals) + 1,
+            ];
+
+            return $subgoals;
+        });
+
+        if ($newSubgoalId !== null) {
+            $this->dispatch('subgoal-created', goalId: $goalId, subgoalId: $newSubgoalId);
+        }
     }
 
     public function toggleSubgoal(int $goalId, string $subgoalId): void

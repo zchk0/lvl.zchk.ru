@@ -41,7 +41,7 @@
                     <label class="block text-sm mb-1">Описание</label>
                     <textarea
                         placeholder="Подробное описание цели..."
-                        rows="4"
+                        rows="5"
                         wire:model.defer="description"
                         class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
                 </div>

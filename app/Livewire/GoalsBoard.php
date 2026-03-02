@@ -285,6 +285,7 @@ class GoalsBoard extends Component
                 'id' => $newSubgoalId,
                 'title' => 'Новая подзадача',
                 'is_done' => false,
+                'created_at' => $this->currentSubgoalTimestamp(),
                 'position' => count($subgoals) + 1,
             ];
 
@@ -328,6 +329,7 @@ class GoalsBoard extends Component
                 'id' => $newSubgoalId,
                 'title' => 'Новая подзадача...',
                 'is_done' => false,
+                'created_at' => $this->currentSubgoalTimestamp(),
                 'position' => 0,
             ];
 
@@ -584,8 +586,33 @@ class GoalsBoard extends Component
             'id' => $id,
             'title' => $title,
             'is_done' => (bool) ($item['is_done'] ?? false),
+            'created_at' => $this->normalizeSubgoalCreatedAt($item['created_at'] ?? null),
             'position' => $position,
         ];
+    }
+
+    private function normalizeSubgoalCreatedAt(mixed $createdAt): ?string
+    {
+        if ($createdAt === null || !is_scalar($createdAt)) {
+            return null;
+        }
+
+        $value = trim((string) $createdAt);
+        if ($value === '') {
+            return null;
+        }
+
+        $timestamp = strtotime($value);
+        if ($timestamp === false) {
+            return null;
+        }
+
+        return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    private function currentSubgoalTimestamp(): string
+    {
+        return now()->format('Y-m-d H:i:s');
     }
 
     private function makeSubgoalId(): string

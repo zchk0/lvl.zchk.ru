@@ -165,7 +165,7 @@
                                 data-subgoal-item
                                 data-subgoal-id="{{ $subgoalId }}"
                                 draggable="true"
-                                class="group flex items-start gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
+                                class="group flex items-center gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
                                 <span
                                     data-subgoal-drag-handle
                                     draggable="true"
@@ -194,7 +194,7 @@
                                     x-on:input="resizeSubgoalTitle($el)"
                                     @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
-                                    class="flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    class="mt-[-5px] flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
                                     style="height: 1.75rem; min-height: 1.75rem; field-sizing: content;"
                                     aria-label="Название подзадачи">{{ $title }}</textarea>
 

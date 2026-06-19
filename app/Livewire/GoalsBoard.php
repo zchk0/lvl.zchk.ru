@@ -13,6 +13,7 @@ class GoalsBoard extends Component
     public bool $showModal = false;
     public bool $showViewModal = false;
     public ?Goal $viewingGoal = null;
+    public ?int $confirmSubgoalCostsGoalId = null;
 
     // Синхронизируем с URL: ?priority=1|2|3|4|all
     #[Url(as: 'priority', except: 'all')]
@@ -89,6 +90,7 @@ class GoalsBoard extends Component
     {
         $this->showViewModal = false;
         $this->viewingGoal = null;
+        $this->confirmSubgoalCostsGoalId = null;
     }
 
     public function openEdit(int $id): void
@@ -457,6 +459,51 @@ class GoalsBoard extends Component
         });
     }
 
+    public function requestSubgoalCostsSync(int $goalId): void
+    {
+        Goal::findOrFail($goalId);
+        $this->confirmSubgoalCostsGoalId = $goalId;
+    }
+
+    public function cancelSubgoalCostsSync(): void
+    {
+        $this->confirmSubgoalCostsGoalId = null;
+    }
+
+    public function confirmSubgoalCostsSync(): void
+    {
+        if ($this->confirmSubgoalCostsGoalId === null) {
+            return;
+        }
+
+        $goalId = $this->confirmSubgoalCostsGoalId;
+        $this->confirmSubgoalCostsGoalId = null;
+        $this->syncSubgoalCostsToTarget($goalId);
+    }
+
+    public function syncSubgoalCostsToTarget(int $goalId): void
+    {
+        $goal = Goal::findOrFail($goalId);
+        $subgoals = $this->normalizeSubgoals($goal->subgoals);
+        $total = 0.0;
+
+        foreach ($subgoals as $subgoal) {
+            $total += $this->sumRubleAmounts((string) ($subgoal['title'] ?? ''));
+        }
+
+        $goal->target_amount = max(0, $total);
+
+        if ($goal->is_completed) {
+            $goal->saved_amount = $goal->target_amount;
+        }
+
+        $goal->save();
+
+        if ($this->viewingGoal?->id === $goal->id) {
+            $this->viewingGoal = $goal->fresh();
+        }
+    }
+
     public function toggleCompleted(int $id): void
     {
         $goal = Goal::findOrFail($id);
@@ -621,6 +668,29 @@ class GoalsBoard extends Component
         }
 
         return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    private function sumRubleAmounts(string $text): float
+    {
+        $text = str_replace("\xc2\xa0", ' ', $text);
+
+        preg_match_all(
+            '/([+\-]?)\s*([0-9][0-9 ]*)\s*(?:₽|руб\.?|р\.?)(?![A-Za-zА-Яа-яЁё])/iu',
+            $text,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $total = 0.0;
+        foreach ($matches as $match) {
+            $sign = $match[1] ?? '';
+            $amount = str_replace(' ', '', $match[2] ?? '0');
+            $value = (float) $amount;
+
+            $total += $sign === '-' ? -$value : $value;
+        }
+
+        return $total;
     }
 
     private function currentSubgoalTimestamp(): string

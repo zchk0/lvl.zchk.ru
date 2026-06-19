@@ -147,9 +147,19 @@
                         });
                     "
                     class="space-y-3">
-                    <h3 class="text-sm font-semibold text-slate-300">
-                        Подзадачи {{ $completedSubgoals }}/{{ $subgoals->count() }}
-                    </h3>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 class="text-sm font-semibold text-slate-300">
+                            Подзадачи {{ $completedSubgoals }}/{{ $subgoals->count() }}
+                        </h3>
+                        <button
+                            type="button"
+                            wire:click="requestSubgoalCostsSync({{ $viewingGoal->id }})"
+                            class="inline-flex items-center justify-center px-3 py-1.5 rounded-xl border border-slate-600 text-xs font-medium text-slate-200 hover:bg-slate-700/60 hover:border-slate-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Посчитать рублевые суммы из подзадач и записать в целевую сумму"
+                            {{ $subgoals->isEmpty() ? 'disabled' : '' }}>
+                            Затраты в цель
+                        </button>
+                    </div>
 
                     <div
                         data-subgoals-list
@@ -194,7 +204,7 @@
                                     x-on:input="resizeSubgoalTitle($el)"
                                     @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
-                                    class="mt-[-4.6px] flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    class="mt-[-4.5px] flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
                                     style="height: 1.75rem; min-height: 1.75rem; field-sizing: content;"
                                     aria-label="Название подзадачи">{{ $title }}</textarea>
 
@@ -293,4 +303,47 @@
             </div>
         </div>
     </div>
+
+    @if($confirmSubgoalCostsGoalId === $viewingGoal->id)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70" wire:click="cancelSubgoalCostsSync"></div>
+            <div class="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-800 p-5 shadow-2xl">
+                <h3 class="text-base font-semibold text-slate-100">
+                    Перенести сумму затрат в цель?
+                </h3>
+                <div class="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+                    <p>
+                        Система прочитает все подзадачи и найдёт рублёвые суммы вида
+                        <span class="text-slate-100">+1000₽</span>,
+                        <span class="text-slate-100">-1000₽</span>,
+                        <span class="text-slate-100">1000₽</span>,
+                        <span class="text-slate-100">1000руб</span> или
+                        <span class="text-slate-100">1000р.</span>.
+                    </p>
+                    <p>
+                        Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит текущую целевую сумму цели.
+                    </p>
+                    @if($viewingGoal->is_completed)
+                        <p class="text-amber-200">
+                            Цель уже выполнена, поэтому достигнутая сумма тоже будет обновлена до новой целевой суммы.
+                        </p>
+                    @endif
+                </div>
+                <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        wire:click="cancelSubgoalCostsSync"
+                        class="px-4 py-2 rounded-xl bg-slate-700 text-sm text-slate-100 hover:bg-slate-600 transition">
+                        Отмена
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="confirmSubgoalCostsSync"
+                        class="px-4 py-2 rounded-xl bg-indigo-500 text-sm font-semibold text-white hover:bg-indigo-600 transition">
+                        Подтвердить
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

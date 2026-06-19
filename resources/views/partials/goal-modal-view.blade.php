@@ -323,6 +323,18 @@
                     <p>
                         Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит текущую целевую сумму цели.
                     </p>
+                    @if($pendingSubgoalCostsCount > 0)
+                        <p class="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-slate-200">
+                            Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано:
+                            <span class="font-semibold text-slate-100">
+                                {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
+                            </span>
+                        </p>
+                    @else
+                        <p class="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-amber-200">
+                            Рублёвые суммы не найдены. Целевая сумма не будет изменена.
+                        </p>
+                    @endif
                     @if($viewingGoal->is_completed)
                         <p class="text-amber-200">
                             Цель уже выполнена, поэтому достигнутая сумма тоже будет обновлена до новой целевой суммы.
@@ -339,7 +351,8 @@
                     <button
                         type="button"
                         wire:click="confirmSubgoalCostsSync"
-                        class="px-4 py-2 rounded-xl bg-indigo-500 text-sm font-semibold text-white hover:bg-indigo-600 transition">
+                        class="px-4 py-2 rounded-xl bg-indigo-500 text-sm font-semibold text-white hover:bg-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        {{ $pendingSubgoalCostsCount === 0 ? 'disabled' : '' }}>
                         Подтвердить
                     </button>
                 </div>

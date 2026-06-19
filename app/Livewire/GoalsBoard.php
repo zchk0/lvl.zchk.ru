@@ -14,6 +14,8 @@ class GoalsBoard extends Component
     public bool $showViewModal = false;
     public ?Goal $viewingGoal = null;
     public ?int $confirmSubgoalCostsGoalId = null;
+    public float $pendingSubgoalCostsTotal = 0.0;
+    public int $pendingSubgoalCostsCount = 0;
 
     // Синхронизируем с URL: ?priority=1|2|3|4|all
     #[Url(as: 'priority', except: 'all')]
@@ -90,7 +92,7 @@ class GoalsBoard extends Component
     {
         $this->showViewModal = false;
         $this->viewingGoal = null;
-        $this->confirmSubgoalCostsGoalId = null;
+        $this->resetSubgoalCostsConfirmation();
     }
 
     public function openEdit(int $id): void
@@ -461,13 +463,17 @@ class GoalsBoard extends Component
 
     public function requestSubgoalCostsSync(int $goalId): void
     {
-        Goal::findOrFail($goalId);
+        $goal = Goal::findOrFail($goalId);
+        [$total, $count] = $this->calculateSubgoalCosts($goal);
+
         $this->confirmSubgoalCostsGoalId = $goalId;
+        $this->pendingSubgoalCostsTotal = $total;
+        $this->pendingSubgoalCostsCount = $count;
     }
 
     public function cancelSubgoalCostsSync(): void
     {
-        $this->confirmSubgoalCostsGoalId = null;
+        $this->resetSubgoalCostsConfirmation();
     }
 
     public function confirmSubgoalCostsSync(): void
@@ -477,18 +483,17 @@ class GoalsBoard extends Component
         }
 
         $goalId = $this->confirmSubgoalCostsGoalId;
-        $this->confirmSubgoalCostsGoalId = null;
+        $this->resetSubgoalCostsConfirmation();
         $this->syncSubgoalCostsToTarget($goalId);
     }
 
     public function syncSubgoalCostsToTarget(int $goalId): void
     {
         $goal = Goal::findOrFail($goalId);
-        $subgoals = $this->normalizeSubgoals($goal->subgoals);
-        $total = 0.0;
+        [$total, $count] = $this->calculateSubgoalCosts($goal);
 
-        foreach ($subgoals as $subgoal) {
-            $total += $this->sumRubleAmounts((string) ($subgoal['title'] ?? ''));
+        if ($count === 0) {
+            return;
         }
 
         $goal->target_amount = max(0, $total);
@@ -584,6 +589,28 @@ class GoalsBoard extends Component
         }
     }
 
+    private function resetSubgoalCostsConfirmation(): void
+    {
+        $this->confirmSubgoalCostsGoalId = null;
+        $this->pendingSubgoalCostsTotal = 0.0;
+        $this->pendingSubgoalCostsCount = 0;
+    }
+
+    private function calculateSubgoalCosts(Goal $goal): array
+    {
+        $subgoals = $this->normalizeSubgoals($goal->subgoals);
+        $total = 0.0;
+        $count = 0;
+
+        foreach ($subgoals as $subgoal) {
+            [$subgoalTotal, $subgoalCount] = $this->sumRubleAmounts((string) ($subgoal['title'] ?? ''));
+            $total += $subgoalTotal;
+            $count += $subgoalCount;
+        }
+
+        return [$total, $count];
+    }
+
     private function normalizeSubgoals(mixed $subgoals, bool $sortByPosition = true): array
     {
         if (!is_array($subgoals)) {
@@ -670,16 +697,20 @@ class GoalsBoard extends Component
         return date('Y-m-d H:i:s', $timestamp);
     }
 
-    private function sumRubleAmounts(string $text): float
+    private function sumRubleAmounts(string $text): array
     {
         $text = str_replace("\xc2\xa0", ' ', $text);
 
-        preg_match_all(
-            '/([+\-]?)\s*([0-9][0-9 ]*)\s*(?:₽|руб\.?|р\.?)(?![A-Za-zА-Яа-яЁё])/iu',
+        $matched = preg_match_all(
+            '/([+\-]?)\s*([0-9][0-9 ]*)\s*(?:\x{20BD}|\x{0440}\x{0443}\x{0431}\.?|\x{0440}\.?)(?!\p{L})/iu',
             $text,
             $matches,
             PREG_SET_ORDER
         );
+
+        if ($matched === false) {
+            return [0.0, 0];
+        }
 
         $total = 0.0;
         foreach ($matches as $match) {
@@ -690,7 +721,7 @@ class GoalsBoard extends Component
             $total += $sign === '-' ? -$value : $value;
         }
 
-        return $total;
+        return [$total, count($matches)];
     }
 
     private function currentSubgoalTimestamp(): string

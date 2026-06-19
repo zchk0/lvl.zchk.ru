@@ -30,6 +30,12 @@
                 class="w-full rounded-2xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-600 transition">
                 Войти
             </button>
+
+            <a
+                href="{{ url('/') }}"
+                class="block text-center text-xs text-slate-500 hover:text-slate-300 transition">
+                На главную
+            </a>
         </form>
     </div>
 </body>

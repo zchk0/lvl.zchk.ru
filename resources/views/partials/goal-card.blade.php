@@ -11,7 +11,7 @@ $dragEnabled = $dragEnabled ?? true;
         <div>
             <button
                 wire:click="openView({{ $goal->id }})"
-                class="font-semibold text-slate-100 text-base {{ $goal->is_completed ? 'line-through text-slate-400' : '' }} text-left hover:text-indigo-300 transition cursor-pointer">
+                class="font-semibold text-slate-100 text-base leading-[1.4rem] {{ $goal->is_completed ? 'line-through text-slate-400' : '' }} text-left hover:text-indigo-300 transition cursor-pointer">
                 {{ $goal->title }}
             </button>
             @if($goal->author_name)

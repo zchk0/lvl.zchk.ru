@@ -23,7 +23,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-semibold">
-                    Цели v0.50
+                    Цели v0.51
                 </h1>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
                     <span>{{ $currentBoard->name }}</span>

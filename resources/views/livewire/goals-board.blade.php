@@ -15,7 +15,7 @@
             ? 'flex flex-col gap-3'
             : 'grid grid-cols-1 md:grid-cols-2 md:grid-flow-col gap-3 md:[grid-template-rows:repeat(var(--goal-rows),minmax(0,max-content))]';
         $isSearch = mb_strlen(trim($search)) > 0;
-        $dragEnabled = ! $isSearch;
+        $dragEnabled = ! $isSearch && ! $hideCompleted;
     @endphp
 
     <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
@@ -56,6 +56,14 @@
                         <option value="4">Архив</option>
                     </select>
                 </div>
+                <label class="inline-flex items-center justify-between gap-3 rounded-2xl border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 cursor-pointer select-none">
+                    <span class="whitespace-nowrap">Скрыть готовые</span>
+                    <input
+                        type="checkbox"
+                        wire:model.live="hideCompleted"
+                        class="sr-only peer">
+                    <span class="relative h-5 w-9 shrink-0 rounded-full bg-slate-700 border border-slate-500 transition after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-slate-300 after:transition peer-checked:bg-emerald-500/80 peer-checked:border-emerald-400 peer-checked:after:translate-x-4 peer-checked:after:bg-white"></span>
+                </label>
             </div>
         </div>
 

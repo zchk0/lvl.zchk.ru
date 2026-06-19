@@ -22,6 +22,9 @@ class GoalsBoard extends Component
     #[Url(as: 'q', except: '')]
     public string $search = '';
 
+    #[Url(as: 'hide_done', except: false)]
+    public bool $hideCompleted = false;
+
     public ?int $editingId = null;
 
     public string $title = '';
@@ -43,6 +46,10 @@ class GoalsBoard extends Component
         // Фильтр по выбранной колонке (если не all)
         if ($this->visiblePriority !== 'all') {
             $query->where('priority', (int) $this->visiblePriority);
+        }
+
+        if ($this->hideCompleted) {
+            $query->where('is_completed', false);
         }
 
         // Поиск по карточкам

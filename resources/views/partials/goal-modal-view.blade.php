@@ -119,15 +119,29 @@
                 <div
                     data-subgoals-board
                     data-goal-id="{{ $viewingGoal->id }}"
-                    x-data="{}"
+                    x-data="{
+                        resizeSubgoalTitle(field) {
+                            if (!field) return;
+                            field.style.height = '1.75rem';
+                            field.style.height = Math.max(field.scrollHeight, 28) + 'px';
+                        },
+                        resizeSubgoalTitles() {
+                            this.$el.querySelectorAll('[data-subgoal-title]').forEach((field) => this.resizeSubgoalTitle(field));
+                        },
+                    }"
+                    x-init="$nextTick(() => {
+                        resizeSubgoalTitles();
+                        requestAnimationFrame(() => resizeSubgoalTitles());
+                        setTimeout(() => resizeSubgoalTitles(), 150);
+                    })"
                     x-on:subgoal-created.window="
                         if (Number($event.detail.goalId) !== Number($el.dataset.goalId)) return;
                         requestAnimationFrame(() => {
                             const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] [data-subgoal-title]';
                             const field = $el.querySelector(selector);
                             if (!field) return;
-                            field.style.height = 'auto';
-                            field.style.height = field.scrollHeight + 'px';
+                            resizeSubgoalTitle(field);
+                            setTimeout(() => resizeSubgoalTitle(field), 150);
                             field.focus();
                             field.select();
                         });
@@ -144,7 +158,8 @@
                             @php
                                 $subgoalId = (string) ($subgoal['id'] ?? '');
                                 $isDone = (bool) ($subgoal['is_done'] ?? false);
-                                $title = (string) ($subgoal['title'] ?? 'Новая подзадача');
+                                $title = trim((string) preg_replace('/\s+/u', ' ', (string) ($subgoal['title'] ?? 'Новая подзадача')));
+                                $title = $title !== '' ? $title : 'Новая подзадача';
                             @endphp
                             <div
                                 data-subgoal-item
@@ -171,11 +186,16 @@
                                     data-subgoal-title
                                     rows="1"
                                     wrap="soft"
-                                    x-init="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
-                                    x-on:input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+                                    x-init="$nextTick(() => {
+                                        resizeSubgoalTitle($el);
+                                        requestAnimationFrame(() => resizeSubgoalTitle($el));
+                                        setTimeout(() => resizeSubgoalTitle($el), 150);
+                                    })"
+                                    x-on:input="resizeSubgoalTitle($el)"
                                     @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     class="flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    style="height: 1.75rem; min-height: 1.75rem; field-sizing: content;"
                                     aria-label="Название подзадачи">{{ $title }}</textarea>
 
                                 <button

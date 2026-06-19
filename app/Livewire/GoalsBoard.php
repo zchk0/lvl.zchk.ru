@@ -702,7 +702,7 @@ class GoalsBoard extends Component
         $text = str_replace("\xc2\xa0", ' ', $text);
 
         $matched = preg_match_all(
-            '/([+\-]?)\s*([0-9][0-9 ]*)\s*(?:\x{20BD}|\x{0440}\x{0443}\x{0431}\.?|\x{0440}\.?)(?!\p{L})/iu',
+            '/([+\-]?)([0-9][0-9 ]*)\s*(?:\x{20BD}|\x{0440}\x{0443}\x{0431}\.?|\x{0440}\.?)(?!\p{L})/iu',
             $text,
             $matches,
             PREG_SET_ORDER

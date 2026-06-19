@@ -314,11 +314,9 @@
                 <div class="mt-3 space-y-2 text-sm leading-6 text-slate-300">
                     <p>
                         Система прочитает все подзадачи и найдёт рублёвые суммы вида
-                        <span class="text-slate-100">+1000₽</span>,
-                        <span class="text-slate-100">-1000₽</span>,
                         <span class="text-slate-100">1000₽</span>,
                         <span class="text-slate-100">1000руб</span> или
-                        <span class="text-slate-100">1000р.</span>.
+                        <span class="text-slate-100">1000р</span>.
                     </p>
                     <p>
                         Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит текущую целевую сумму цели.

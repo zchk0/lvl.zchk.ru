@@ -543,7 +543,10 @@ class GoalsBoard extends Component
 
         if (! $goal->is_completed) {
             $goal->is_completed = true;
-            $goal->saved_amount = $goal->target_amount;
+
+            if ($goal->target_amount > 0 && $goal->saved_amount < $goal->target_amount) {
+                $goal->saved_amount = $goal->target_amount;
+            }
         } else {
             $goal->is_completed = false;
         }

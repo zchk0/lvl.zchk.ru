@@ -15,7 +15,7 @@
             ? 'flex flex-col gap-3'
             : 'grid grid-cols-1 md:grid-cols-2 md:grid-flow-col gap-3 md:[grid-template-rows:repeat(var(--goal-rows),minmax(0,max-content))]';
         $isSearch = mb_strlen(trim($search)) > 0;
-        $dragEnabled = ! $isSearch && $showClosed;
+        $dragEnabled = ! $isSearch;
     @endphp
 
     <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
@@ -23,7 +23,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-semibold">
-                    Цели v0.51
+                    Цели v0.52
                 </h1>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
                     <span>{{ $currentBoard->name }}</span>

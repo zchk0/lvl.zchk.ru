@@ -123,11 +123,13 @@
                     x-on:subgoal-created.window="
                         if (Number($event.detail.goalId) !== Number($el.dataset.goalId)) return;
                         requestAnimationFrame(() => {
-                            const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] input[type=&quot;text&quot;]';
-                            const input = $el.querySelector(selector);
-                            if (!input) return;
-                            input.focus();
-                            input.select();
+                            const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] [data-subgoal-title]';
+                            const field = $el.querySelector(selector);
+                            if (!field) return;
+                            field.style.height = 'auto';
+                            field.style.height = field.scrollHeight + 'px';
+                            field.focus();
+                            field.select();
                         });
                     "
                     class="space-y-3">
@@ -148,7 +150,7 @@
                                 data-subgoal-item
                                 data-subgoal-id="{{ $subgoalId }}"
                                 draggable="true"
-                                class="group flex items-center gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
+                                class="group flex items-start gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
                                 <span
                                     data-subgoal-drag-handle
                                     draggable="true"
@@ -165,13 +167,16 @@
                                     &#10003;
                                 </button>
 
-                                <input
-                                    type="text"
-                                    value="{{ $title }}"
+                                <textarea
+                                    data-subgoal-title
+                                    rows="1"
+                                    wrap="soft"
+                                    x-init="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+                                    x-on:input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
                                     @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
                                     @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
-                                    class="flex-1 min-w-0 bg-transparent text-sm px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
-                                    aria-label="Название подзадачи">
+                                    class="flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    aria-label="Название подзадачи">{{ $title }}</textarea>
 
                                 <button
                                     type="button"

@@ -15,14 +15,14 @@
             ? 'flex flex-col gap-3'
             : 'grid grid-cols-1 md:grid-cols-2 md:grid-flow-col gap-3 md:[grid-template-rows:repeat(var(--goal-rows),minmax(0,max-content))]';
         $isSearch = mb_strlen(trim($search)) > 0;
-        $dragEnabled = ! $isSearch && ! $hideCompleted;
+        $dragEnabled = ! $isSearch && $showClosed;
     @endphp
 
     <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.46
+                Цели v0.47
             </h1>
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm w-full sm:w-auto">
@@ -57,10 +57,10 @@
                     </select>
                 </div>
                 <label class="inline-flex items-center justify-between gap-3 rounded-2xl border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 cursor-pointer select-none">
-                    <span class="whitespace-nowrap">Скрыть готовые</span>
+                    <span class="whitespace-nowrap">Закрытые</span>
                     <input
                         type="checkbox"
-                        wire:model.live="hideCompleted"
+                        wire:model.live="showClosed"
                         class="sr-only peer">
                     <span class="relative h-5 w-9 shrink-0 rounded-full bg-slate-700 border border-slate-500 transition after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-slate-300 after:transition peer-checked:bg-emerald-500/80 peer-checked:border-emerald-400 peer-checked:after:translate-x-4 peer-checked:after:bg-white"></span>
                 </label>

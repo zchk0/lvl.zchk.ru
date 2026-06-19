@@ -22,8 +22,8 @@ class GoalsBoard extends Component
     #[Url(as: 'q', except: '')]
     public string $search = '';
 
-    #[Url(as: 'hide_done', except: false)]
-    public bool $hideCompleted = false;
+    #[Url(as: 'closed', except: false)]
+    public bool $showClosed = false;
 
     public ?int $editingId = null;
 
@@ -48,7 +48,7 @@ class GoalsBoard extends Component
             $query->where('priority', (int) $this->visiblePriority);
         }
 
-        if ($this->hideCompleted) {
+        if (! $this->showClosed) {
             $query->where('is_completed', false);
         }
 

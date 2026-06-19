@@ -1,4 +1,4 @@
-<div
+﻿<div
     data-modal-open="true"
     class="fixed inset-0 z-40 overflow-y-auto overscroll-contain"
     wire:keydown.escape="closeViewModal">
@@ -176,7 +176,7 @@
                                 <button
                                     type="button"
                                     wire:click="toggleSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}')"
-                                    class="w-6 h-6 shrink-0 rounded-full border inline-flex items-center justify-center transition
+                                    class="my-1 w-6 h-6 shrink-0 rounded-full border inline-flex items-center justify-center transition
                                         {{ $isDone ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-500 text-transparent hover:border-slate-300 hover:text-slate-300' }}"
                                     title="Переключить статус">
                                     &#10003;

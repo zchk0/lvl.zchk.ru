@@ -21,9 +21,20 @@
     <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
-            <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.49
-            </h1>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-semibold">
+                    Цели v0.50
+                </h1>
+                <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
+                    <span>{{ $currentBoard->name }}</span>
+                    <form method="POST" action="{{ route('pin.logout') }}">
+                        @csrf
+                        <button class="text-xs text-indigo-300 hover:text-indigo-200 transition">
+                            Сменить доску
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm w-full sm:w-auto">
                 {{-- Поиск --}}

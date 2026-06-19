@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Board;
 use App\Models\Goal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -42,7 +43,10 @@ class GoalsBoard extends Component
 
     public function render()
     {
+        $boardId = $this->currentBoardId();
+        $currentBoard = Board::findOrFail($boardId);
         $query = Goal::query()
+            ->where('board_id', $boardId)
             ->orderBy('priority')
             ->orderBy('position')
             ->orderBy('id');
@@ -73,6 +77,7 @@ class GoalsBoard extends Component
             'mediumGoals' => $goals[2] ?? collect(),
             'lowGoals' => $goals[3] ?? collect(),
             'archive' => $goals[4] ?? collect(),
+            'currentBoard' => $currentBoard,
         ]);
     }
 
@@ -85,7 +90,7 @@ class GoalsBoard extends Component
 
     public function openView(int $id): void
     {
-        $this->viewingGoal = Goal::findOrFail($id);
+        $this->viewingGoal = $this->findGoalForCurrentBoard($id);
         $this->showViewModal = true;
     }
 
@@ -100,7 +105,7 @@ class GoalsBoard extends Component
     {
         $this->closeViewModal();
 
-        $goal = Goal::findOrFail($id);
+        $goal = $this->findGoalForCurrentBoard($id);
 
         $this->editingId = $goal->id;
         $this->title = $goal->title;
@@ -140,15 +145,19 @@ class GoalsBoard extends Component
         ];
 
         if ($this->editingId) {
-            $goal = Goal::findOrFail($this->editingId);
+            $goal = $this->findGoalForCurrentBoard($this->editingId);
             $goal->update($data);
         } else {
-            DB::transaction(function () use ($data) {
+            $boardId = $this->currentBoardId();
+
+            DB::transaction(function () use ($data, $boardId) {
                 // Сдвигаем все позиции вниз внутри priority
                 // Новая карточка становится первой
-                Goal::where('priority', $data['priority'])
+                Goal::where('board_id', $boardId)
+                    ->where('priority', $data['priority'])
                     ->increment('position');
                 $data['position'] = 1;
+                $data['board_id'] = $boardId;
 
                 Goal::create($data);
             });
@@ -159,13 +168,16 @@ class GoalsBoard extends Component
 
     public function moveToPriority(int $id, int $priority): void
     {
-        $goal = Goal::findOrFail($id);
+        $boardId = $this->currentBoardId();
+        $goal = $this->findGoalForCurrentBoard($id);
 
         if ($goal->priority === $priority) {
             return;
         }
 
-        $maxPosition = Goal::where('priority', $priority)->max('position') ?? 0;
+        $maxPosition = Goal::where('board_id', $boardId)
+            ->where('priority', $priority)
+            ->max('position') ?? 0;
 
         $goal->priority = $priority;
         $goal->position = $maxPosition + 1;
@@ -200,12 +212,15 @@ class GoalsBoard extends Component
             return;
         }
 
+        $boardId = $this->currentBoardId();
         foreach ($normalized as $priority => $ids) {
             foreach ($ids as $index => $id) {
-                Goal::whereKey($id)->update([
-                    'priority' => $priority,
-                    'position' => $index + 1,
-                ]);
+                Goal::where('board_id', $boardId)
+                    ->whereKey($id)
+                    ->update([
+                        'priority' => $priority,
+                        'position' => $index + 1,
+                    ]);
             }
         }
     }
@@ -221,12 +236,14 @@ class GoalsBoard extends Component
             return;
         }
 
-        $goal = Goal::find($id);
+        $boardId = $this->currentBoardId();
+        $goal = Goal::where('board_id', $boardId)->find($id);
         if (! $goal) {
             return;
         }
 
-        $ids = Goal::where('priority', $goal->priority)
+        $ids = Goal::where('board_id', $boardId)
+            ->where('priority', $goal->priority)
             ->orderBy('position')
             ->orderBy('id')
             ->pluck('id')
@@ -259,12 +276,14 @@ class GoalsBoard extends Component
             return;
         }
 
-        $goal = Goal::find($id);
+        $boardId = $this->currentBoardId();
+        $goal = Goal::where('board_id', $boardId)->find($id);
         if (! $goal) {
             return;
         }
 
-        $ids = Goal::where('priority', $goal->priority)
+        $ids = Goal::where('board_id', $boardId)
+            ->where('priority', $goal->priority)
             ->orderBy('position')
             ->orderBy('id')
             ->pluck('id')
@@ -464,7 +483,7 @@ class GoalsBoard extends Component
 
     public function requestSubgoalCostsSync(int $goalId): void
     {
-        $goal = Goal::findOrFail($goalId);
+        $goal = $this->findGoalForCurrentBoard($goalId);
         [$total, $count] = $this->calculateSubgoalCosts($goal);
 
         $this->confirmSubgoalCostsGoalId = $goalId;
@@ -492,7 +511,7 @@ class GoalsBoard extends Component
 
     public function syncSubgoalCostsToGoal(int $goalId, string $destination = 'target'): void
     {
-        $goal = Goal::findOrFail($goalId);
+        $goal = $this->findGoalForCurrentBoard($goalId);
         [$total, $count] = $this->calculateSubgoalCosts($goal);
 
         if ($count === 0) {
@@ -520,7 +539,7 @@ class GoalsBoard extends Component
 
     public function toggleCompleted(int $id): void
     {
-        $goal = Goal::findOrFail($id);
+        $goal = $this->findGoalForCurrentBoard($id);
 
         if (! $goal->is_completed) {
             $goal->is_completed = true;
@@ -534,7 +553,7 @@ class GoalsBoard extends Component
 
     public function togglePublic(int $id): void
     {
-        $goal = Goal::findOrFail($id);
+        $goal = $this->findGoalForCurrentBoard($id);
         $goal->is_public = ! $goal->is_public;
 
         if ($goal->is_public && empty($goal->public_token)) {
@@ -550,7 +569,9 @@ class GoalsBoard extends Component
 
     public function delete(int $id): void
     {
-        Goal::whereKey($id)->delete();
+        Goal::where('board_id', $this->currentBoardId())
+            ->whereKey($id)
+            ->delete();
 
         if ($this->editingId === $id) {
             $this->closeModal();
@@ -582,7 +603,7 @@ class GoalsBoard extends Component
 
     private function updateSubgoalsForGoal(int $goalId, callable $mutator): void
     {
-        $goal = Goal::findOrFail($goalId);
+        $goal = $this->findGoalForCurrentBoard($goalId);
         $subgoals = $this->normalizeSubgoals($goal->subgoals);
         $updatedSubgoals = $mutator($subgoals);
 
@@ -596,6 +617,19 @@ class GoalsBoard extends Component
         if ($this->viewingGoal?->id === $goal->id) {
             $this->viewingGoal = $goal->fresh();
         }
+    }
+
+    private function currentBoardId(): int
+    {
+        $boardId = (int) session('board_id', 0);
+        abort_if($boardId <= 0, 403);
+
+        return $boardId;
+    }
+
+    private function findGoalForCurrentBoard(int $goalId): Goal
+    {
+        return Goal::where('board_id', $this->currentBoardId())->findOrFail($goalId);
     }
 
     private function resetSubgoalCostsConfirmation(): void

@@ -46,6 +46,7 @@ class ExportGoalsCommand extends Command
         // Явно выбираем поля, чтобы не тащить всякий мусор
         $data = $goals->map(function (Goal $goal) {
             return [
+                'board_id' => (int) $goal->board_id,
                 'title' => $goal->title,
                 'url' => $goal->url,
                 'description' => $goal->description ?? '',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Board;
 use App\Models\Goal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,19 +28,102 @@ Route::post('/pin/check', function (Request $request) {
         'pin' => ['required', 'string'],
     ]);
 
-    $correctPin = env('PIN_CODE', '1011');
+    $board = Board::query()
+        ->where('pin_code', $request->input('pin'))
+        ->first();
 
-    if ($request->input('pin') !== $correctPin) {
+    if (! $board) {
         return back()
             ->withErrors(['pin' => 'Неверный PIN-код'])
             ->withInput();
     }
 
-    $cookieName = env('PIN_COOKIE_NAME', 'pin_ok');
-    $minutes    = (int) env('PIN_COOKIE_MINUTES', 60);
+    $request->session()->put('board_id', $board->id);
 
-    $cookie = cookie($cookieName, '1', $minutes, '/');
-
-    return redirect()->intended('/')
-        ->withCookie($cookie);
+    return redirect()->intended('/');
 })->name('pin.check');
+
+Route::post('/pin/logout', function (Request $request) {
+    $request->session()->forget('board_id');
+
+    return redirect()->route('pin.form');
+})->name('pin.logout');
+
+Route::get('/admin/login', function () {
+    return view('admin-login');
+})->name('admin.login');
+
+Route::post('/admin/login', function (Request $request) {
+    $request->validate([
+        'pin' => ['required', 'string'],
+    ]);
+
+    $adminPin = env('ADMIN_PIN_CODE', env('PIN_CODE', '1011'));
+    if ($request->input('pin') !== $adminPin) {
+        return back()
+            ->withErrors(['pin' => 'Неверный PIN администратора'])
+            ->withInput();
+    }
+
+    $request->session()->put('admin_ok', true);
+
+    return redirect()->route('admin.boards');
+})->name('admin.login.check');
+
+Route::post('/admin/logout', function (Request $request) {
+    $request->session()->forget('admin_ok');
+
+    return redirect()->route('admin.login');
+})->name('admin.logout');
+
+Route::get('/admin', function (Request $request) {
+    if (! $request->session()->get('admin_ok')) {
+        return redirect()->route('admin.login');
+    }
+
+    return view('admin-boards', [
+        'boards' => Board::query()
+            ->withCount('goals')
+            ->orderBy('name')
+            ->get(),
+    ]);
+})->name('admin.boards');
+
+Route::post('/admin/boards', function (Request $request) {
+    if (! $request->session()->get('admin_ok')) {
+        return redirect()->route('admin.login');
+    }
+
+    $data = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'pin_code' => ['required', 'digits:4', 'unique:boards,pin_code'],
+    ]);
+
+    Board::create($data);
+
+    return redirect()
+        ->route('admin.boards')
+        ->with('status', 'Доска создана');
+})->name('admin.boards.store');
+
+Route::delete('/admin/boards/{board}', function (Request $request, Board $board) {
+    if (! $request->session()->get('admin_ok')) {
+        return redirect()->route('admin.login');
+    }
+
+    if (Board::count() <= 1) {
+        return redirect()
+            ->route('admin.boards')
+            ->withErrors(['board' => 'Нельзя удалить последнюю доску']);
+    }
+
+    if ((int) $request->session()->get('board_id', 0) === $board->id) {
+        $request->session()->forget('board_id');
+    }
+
+    $board->delete();
+
+    return redirect()
+        ->route('admin.boards')
+        ->with('status', 'Доска удалена');
+})->name('admin.boards.destroy');

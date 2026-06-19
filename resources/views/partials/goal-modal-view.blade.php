@@ -157,7 +157,7 @@
                             class="inline-flex items-center justify-center px-3 py-1.5 rounded-xl border border-slate-600 text-xs font-medium text-slate-200 hover:bg-slate-700/60 hover:border-slate-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Посчитать рублевые суммы из подзадач и записать в целевую сумму"
                             {{ $subgoals->isEmpty() ? 'disabled' : '' }}>
-                            Затраты в цель
+                            Сумировать затраты
                         </button>
                     </div>
 
@@ -309,7 +309,7 @@
             <div class="absolute inset-0 bg-black/70" wire:click="cancelSubgoalCostsSync"></div>
             <div class="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-800 p-5 shadow-2xl">
                 <h3 class="text-base font-semibold text-slate-100">
-                    Перенести сумму затрат в цель?
+                    Перенести сумму затрат?
                 </h3>
                 <div class="mt-3 space-y-2 text-sm leading-6 text-slate-300">
                     <p>
@@ -319,11 +319,35 @@
                         <span class="text-slate-100">1000р</span>.
                     </p>
                     <p>
-                        Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит текущую целевую сумму цели.
+                        Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит выбранное финансовое поле.
                     </p>
+                    <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-1">
+                        <div class="grid grid-cols-2 gap-1">
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    wire:model.live="subgoalCostsDestination"
+                                    value="target"
+                                    class="peer sr-only">
+                                <span class="block rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-300 transition peer-checked:bg-indigo-500 peer-checked:text-white">
+                                    В цель
+                                </span>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    wire:model.live="subgoalCostsDestination"
+                                    value="saved"
+                                    class="peer sr-only">
+                                <span class="block rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-300 transition peer-checked:bg-emerald-500 peer-checked:text-white">
+                                    В достигнуто
+                                </span>
+                            </label>
+                        </div>
+                    </div>
                     @if($pendingSubgoalCostsCount > 0)
                         <p class="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-slate-200">
-                            Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано:
+                            Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано в {{ $subgoalCostsDestination === 'saved' ? 'достигнуто' : 'цель' }}:
                             <span class="font-semibold text-slate-100">
                                 {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
                             </span>
@@ -333,7 +357,7 @@
                             Рублёвые суммы не найдены. Целевая сумма не будет изменена.
                         </p>
                     @endif
-                    @if($viewingGoal->is_completed)
+                    @if($viewingGoal->is_completed && $subgoalCostsDestination === 'target')
                         <p class="text-amber-200">
                             Цель уже выполнена, поэтому достигнутая сумма тоже будет обновлена до новой целевой суммы.
                         </p>

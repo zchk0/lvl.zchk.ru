@@ -16,6 +16,7 @@ class GoalsBoard extends Component
     public ?int $confirmSubgoalCostsGoalId = null;
     public float $pendingSubgoalCostsTotal = 0.0;
     public int $pendingSubgoalCostsCount = 0;
+    public string $subgoalCostsDestination = 'target';
 
     // Синхронизируем с URL: ?priority=1|2|3|4|all
     #[Url(as: 'priority', except: 'all')]
@@ -469,6 +470,7 @@ class GoalsBoard extends Component
         $this->confirmSubgoalCostsGoalId = $goalId;
         $this->pendingSubgoalCostsTotal = $total;
         $this->pendingSubgoalCostsCount = $count;
+        $this->subgoalCostsDestination = 'target';
     }
 
     public function cancelSubgoalCostsSync(): void
@@ -483,11 +485,12 @@ class GoalsBoard extends Component
         }
 
         $goalId = $this->confirmSubgoalCostsGoalId;
+        $destination = $this->subgoalCostsDestination;
         $this->resetSubgoalCostsConfirmation();
-        $this->syncSubgoalCostsToTarget($goalId);
+        $this->syncSubgoalCostsToGoal($goalId, $destination);
     }
 
-    public function syncSubgoalCostsToTarget(int $goalId): void
+    public function syncSubgoalCostsToGoal(int $goalId, string $destination = 'target'): void
     {
         $goal = Goal::findOrFail($goalId);
         [$total, $count] = $this->calculateSubgoalCosts($goal);
@@ -496,10 +499,16 @@ class GoalsBoard extends Component
             return;
         }
 
-        $goal->target_amount = max(0, $total);
+        $amount = max(0, $total);
 
-        if ($goal->is_completed) {
-            $goal->saved_amount = $goal->target_amount;
+        if ($destination === 'saved') {
+            $goal->saved_amount = $amount;
+        } else {
+            $goal->target_amount = $amount;
+
+            if ($goal->is_completed) {
+                $goal->saved_amount = $goal->target_amount;
+            }
         }
 
         $goal->save();
@@ -594,6 +603,7 @@ class GoalsBoard extends Component
         $this->confirmSubgoalCostsGoalId = null;
         $this->pendingSubgoalCostsTotal = 0.0;
         $this->pendingSubgoalCostsCount = 0;
+        $this->subgoalCostsDestination = 'target';
     }
 
     private function calculateSubgoalCosts(Goal $goal): array

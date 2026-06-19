@@ -453,8 +453,14 @@ class GoalsBoard extends Component
     public function toggleCompleted(int $id): void
     {
         $goal = Goal::findOrFail($id);
-        $goal->is_completed = ! $goal->is_completed;
-        $goal->saved_amount = $goal->is_completed ? (int)$goal->target_amount : 0;
+
+        if (! $goal->is_completed) {
+            $goal->is_completed = true;
+            $goal->saved_amount = $goal->target_amount;
+        } else {
+            $goal->is_completed = false;
+        }
+
         $goal->save();
     }
 

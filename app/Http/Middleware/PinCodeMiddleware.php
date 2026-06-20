@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Board;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,8 @@ class PinCodeMiddleware
         $except = [
             'pin',
             'pin/check',
+            'admin',
+            'admin/*',
             'share/*',
         ];
 
@@ -27,10 +30,9 @@ class PinCodeMiddleware
             return $next($request);
         }
 
-        $cookieName = env('PIN_COOKIE_NAME', 'pin_ok');
-
         // Если cookie уже есть и правильная — пропускаем
-        if ($request->cookie($cookieName) === '1') {
+        $boardId = (int)$request->session()->get('board_id', 0);
+        if ($boardId > 0 && Board::whereKey($boardId)->exists()) {
             return $next($request);
         }
 

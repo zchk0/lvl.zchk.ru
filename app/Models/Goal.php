@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Goal extends Model
 {
     protected $fillable = [
+        'board_id',
         'title',
         'description',
+        'subgoals',
         'url',
         'author_name',
         'target_amount',
@@ -18,6 +21,19 @@ class Goal extends Model
         'is_public',
         'public_token',
         'position',
+    ];
+
+    public function board(): BelongsTo
+    {
+        return $this->belongsTo(Board::class);
+    }
+
+    protected $casts = [
+        'subgoals' => 'array',
+        'is_completed' => 'boolean',
+        'is_public' => 'boolean',
+        'priority' => 'integer',
+        'position' => 'integer',
     ];
 
     // Акцессор прогресса в процентах

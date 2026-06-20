@@ -10,7 +10,10 @@
     @php
         $isAll = $visiblePriority === 'all';
         $colsClass = $isAll ? 'md:grid-cols-3' : 'md:grid-cols-1';
-        $widthClass = $isAll ? 'max-w-6xl' : 'max-w-3xl mx-auto';
+        $widthClass = $isAll ? 'max-w-6xl' : 'max-w-4xl mx-auto';
+        $columnModeClass = $isAll
+            ? 'flex flex-col gap-3'
+            : 'grid grid-cols-1 md:grid-cols-2 md:grid-flow-col gap-3 md:[grid-template-rows:repeat(var(--goal-rows),minmax(0,max-content))]';
         $isSearch = mb_strlen(trim($search)) > 0;
         $dragEnabled = ! $isSearch;
     @endphp
@@ -18,9 +21,20 @@
     <div class="max-w-6xl mx-auto px-4" data-goals-board data-drag-enabled="{{ $dragEnabled ? '1' : '0' }}">
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
-            <h1 class="text-2xl sm:text-3xl font-semibold">
-                Цели v0.39
-            </h1>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-semibold">
+                    Цели v0.52
+                </h1>
+                <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
+                    <span>{{ $currentBoard->name }}</span>
+                    <form method="POST" action="{{ route('pin.logout') }}">
+                        @csrf
+                        <button class="text-xs text-indigo-300 hover:text-indigo-200 transition">
+                            Сменить доску
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm w-full sm:w-auto">
                 {{-- Поиск --}}
@@ -53,6 +67,14 @@
                         <option value="4">Архив</option>
                     </select>
                 </div>
+                <label class="inline-flex items-center justify-between gap-3 rounded-2xl border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 cursor-pointer select-none">
+                    <span class="whitespace-nowrap">Закрытые</span>
+                    <input
+                        type="checkbox"
+                        wire:model.live="showClosed"
+                        class="sr-only peer">
+                    <span class="relative h-5 w-9 shrink-0 rounded-full bg-slate-700 border border-slate-500 transition after:absolute after:left-0.5 after:top-0.5 after:h-3.5 after:w-3.5 after:rounded-full after:bg-slate-300 after:transition peer-checked:bg-emerald-500/80 peer-checked:border-emerald-400 peer-checked:after:translate-x-4 peer-checked:after:bg-white"></span>
+                </label>
             </div>
         </div>
 
@@ -93,7 +115,14 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3" data-goals-column data-priority="1">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="1"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($highGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($highGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -140,7 +169,14 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3" data-goals-column data-priority="2">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="2"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($mediumGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($mediumGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -187,7 +223,14 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3" data-goals-column data-priority="3">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="3"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($lowGoals->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($lowGoals as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty
@@ -234,7 +277,14 @@
                         </div>
                     @endif
 
-                    <div class="flex flex-col gap-3" data-goals-column data-priority="4">
+                    <div
+                        class="{{ $columnModeClass }}"
+                        data-goals-column
+                        data-priority="4"
+                        @if(! $isAll)
+                            style="--goal-rows: {{ max(1, (int) ceil($archive->count() / 2)) }};"
+                        @endif
+                    >
                         @forelse($archive as $goal)
                             @include('partials.goal-card', ['goal' => $goal, 'dragEnabled' => $dragEnabled])
                             @empty

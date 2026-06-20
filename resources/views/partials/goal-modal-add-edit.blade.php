@@ -10,7 +10,7 @@
     {{-- центрирование + отступы (контейнер можно скроллить при необходимости) --}}
     <div class="relative flex min-h-[100dvh] items-center justify-center p-4">
         <div
-            class="relative z-50 w-full max-w-lg bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
+            class="relative z-50 w-full max-w-xl bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
             style="max-height: calc(100dvh - 2rem - env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch;">
             <div class="flex items-start justify-between mb-4">
                 <h2 class="text-lg font-semibold">
@@ -41,9 +41,9 @@
                     <label class="block text-sm mb-1">Описание</label>
                     <textarea
                         placeholder="Подробное описание цели..."
-                        rows="3"
+                        rows="5"
                         wire:model.defer="description"
-                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"></textarea>
+                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
                 </div>
 
                 <div>
@@ -89,17 +89,17 @@
                     x-data="{
                         target: $wire.entangle('target_amount'),
                         value:  $wire.entangle('saved_amount'),
-                        get t() { return Math.max(0, parseInt(this.target || 0)); },
-                        get v() { return Math.max(0, parseInt(this.value  || 0)); },
+                        get t() { return Math.max(0, parseFloat(this.target || 0)); },
+                        get v() { return Math.max(0, parseFloat(this.value  || 0)); },
+                        get maxRange() { return Math.max(this.t, this.v, 1); },
                         get pct() {
                             if (!this.t) return 0;
                             return Math.min(100, Math.max(0, (this.v / this.t) * 100));
                         },
                         clamp() {
-                            let v = parseInt(this.value ?? 0);
+                            let v = parseFloat(this.value ?? 0);
                             if (isNaN(v)) v = 0;
                             if (v < 0) v = 0;
-                            if (this.t > 0 && v > this.t) v = this.t;
                             this.value = v;
                         }
                     }"
@@ -121,7 +121,7 @@
                         type="range"
                         class="goal-range w-full"
                         min="0"
-                        :max="t"
+                        :max="maxRange"
                         step="1"
                         x-model.number="value"
                         @input="clamp()"

@@ -65,6 +65,13 @@
           Подтвердить
         </button>
 
+        <a
+          href="{{ route('admin.login') }}"
+          class="text-center text-xs text-slate-500 hover:text-slate-300 transition"
+        >
+          Администратор
+        </a>
+
         {{-- 
         <div class="text-center text-xs sm:text-sm text-slate-400">
           Не получили код?

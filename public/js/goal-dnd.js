@@ -9,9 +9,7 @@ document.addEventListener('livewire:init', () => {
     return !!board && board.dataset.dragEnabled === '1';
   };
 
-  const getAfterElement = (container, y) => {
-    const items = [...container.querySelectorAll(`${cardSelector}:not(.is-dragging)`)];
-
+  const getAfterElementInSingleColumn = (items, y) => {
     return items.reduce(
       (closest, item) => {
         const box = item.getBoundingClientRect();
@@ -23,6 +21,60 @@ document.addEventListener('livewire:init', () => {
       },
       { offset: Number.NEGATIVE_INFINITY, element: null }
     ).element;
+  };
+
+  const getAfterElement = (container, x, y) => {
+    const items = [...container.querySelectorAll(`${cardSelector}:not(.is-dragging)`)];
+    if (items.length === 0) {
+      return null;
+    }
+
+    const laneTolerance = 8;
+    const laneMap = new Map();
+    items.forEach((item) => {
+      const box = item.getBoundingClientRect();
+      const laneKey = Math.round(box.left / laneTolerance) * laneTolerance;
+      if (!laneMap.has(laneKey)) {
+        laneMap.set(laneKey, []);
+      }
+      laneMap.get(laneKey).push({ item, box });
+    });
+
+    const lanes = Array.from(laneMap.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([, entries]) => ({
+        entries: entries.sort((a, b) => a.box.top - b.box.top),
+      }));
+
+    if (lanes.length <= 1) {
+      return getAfterElementInSingleColumn(items, y);
+    }
+
+    const targetLaneIndex = lanes.reduce(
+      (best, lane, index) => {
+        const sample = lane.entries[0];
+        const laneCenterX = sample.box.left + sample.box.width / 2;
+        const distance = Math.abs(x - laneCenterX);
+        if (distance < best.distance) {
+          return { distance, index };
+        }
+        return best;
+      },
+      { distance: Number.POSITIVE_INFINITY, index: 0 }
+    ).index;
+
+    const targetLane = lanes[targetLaneIndex];
+    const beforeInLane = targetLane.entries.find(({ box }) => y < box.top + box.height / 2);
+    if (beforeInLane) {
+      return beforeInLane.item;
+    }
+
+    const nextLane = lanes[targetLaneIndex + 1];
+    if (nextLane && nextLane.entries.length > 0) {
+      return nextLane.entries[0].item;
+    }
+
+    return null;
   };
 
   const buildPayload = (root) => {
@@ -78,9 +130,15 @@ document.addEventListener('livewire:init', () => {
 
     event.preventDefault();
 
-    const afterElement = getAfterElement(column, event.clientY);
+    const afterElement = getAfterElement(column, event.clientX, event.clientY);
+    if (afterElement === draggedCard || afterElement === draggedCard.nextElementSibling) {
+      return;
+    }
+
     if (afterElement == null) {
-      column.appendChild(draggedCard);
+      if (column.lastElementChild !== draggedCard) {
+        column.appendChild(draggedCard);
+      }
     } else {
       column.insertBefore(draggedCard, afterElement);
     }

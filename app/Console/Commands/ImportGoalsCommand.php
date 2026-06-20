@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Board;
 use App\Models\Goal;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,14 @@ class ImportGoalsCommand extends Command
                     Goal::truncate();
                 }
 
+                $boardId = Board::query()->value('id');
+                if (! $boardId) {
+                    $boardId = Board::create([
+                        'name' => env('DEFAULT_BOARD_NAME', 'Основная доска'),
+                        'pin_code' => env('PIN_CODE', '1011'),
+                    ])->id;
+                }
+
                 $count = 0;
 
                 foreach ($data as $item) {
@@ -75,9 +84,11 @@ class ImportGoalsCommand extends Command
                     }
 
                     $payload = [
+                        'board_id' => isset($item['board_id']) ? (int) $item['board_id'] : $boardId,
                         'title' => $item['title'] ?? 'Без названия',
                         'url' => $item['url'] ?? null,
                         'description' => $item['description'] ?? '',
+                        'subgoals' => isset($item['subgoals']) && is_array($item['subgoals']) ? $item['subgoals'] : [],
                         'author_name' => $item['author_name'] ?? null,
                         'target_amount' => isset($item['target_amount']) ? (float) $item['target_amount'] : 0,
                         'saved_amount' => isset($item['saved_amount']) ? (float) $item['saved_amount'] : 0,

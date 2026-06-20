@@ -1,4 +1,4 @@
-<div
+﻿<div
     data-modal-open="true"
     class="fixed inset-0 z-40 overflow-y-auto overscroll-contain"
     wire:keydown.escape="closeViewModal">
@@ -9,7 +9,7 @@
     {{-- центрирование + отступы --}}
     <div class="relative flex min-h-[100dvh] items-center justify-center p-4">
         <div
-            class="relative z-50 w-full max-w-lg bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
+            class="relative z-50 w-full max-w-xl bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 overflow-y-auto overscroll-contain"
             style="max-height: calc(100dvh - 2rem - env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch;">
             <button
                 type="button"
@@ -62,13 +62,15 @@
                                     default => ''
                                 } }}
                         </span>
-                        <span
+                        <button
                             type="button"
+                            wire:click="togglePublic({{ $viewingGoal->id }})"
+                            aria-pressed="{{ $viewingGoal->is_public ? 'true' : 'false' }}"
                             class="text-[11px] px-3 py-1 rounded-full border inline-flex items-center gap-1
                                 {{ $viewingGoal->is_public ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-slate-800 border-slate-600 text-slate-300' }}">
                             <span class="w-2 h-2 rounded-full {{ $viewingGoal->is_public ? 'bg-emerald-300' : 'bg-slate-500' }}"></span>
                             {{ $viewingGoal->is_public ? 'Публичная' : 'Частная' }}
-                        </span>
+                        </button>
                     </div>
                     @if($viewingGoal->is_public && $viewingGoal->public_token)
                     <div class="mt-3 flex items-center gap-2">
@@ -106,6 +108,129 @@
                     </p>
                 </div>
                 @endif
+
+                {{-- Подзадачи --}}
+                @php
+                    $subgoals = collect($viewingGoal->subgoals ?? [])
+                        ->sortBy('position')
+                        ->values();
+                    $completedSubgoals = $subgoals->where('is_done', true)->count();
+                @endphp
+                <div
+                    data-subgoals-board
+                    data-goal-id="{{ $viewingGoal->id }}"
+                    x-data="{
+                        resizeSubgoalTitle(field) {
+                            if (!field) return;
+                            field.style.height = '1.75rem';
+                            field.style.height = Math.max(field.scrollHeight, 28) + 'px';
+                        },
+                        resizeSubgoalTitles() {
+                            this.$el.querySelectorAll('[data-subgoal-title]').forEach((field) => this.resizeSubgoalTitle(field));
+                        },
+                    }"
+                    x-init="$nextTick(() => {
+                        resizeSubgoalTitles();
+                        requestAnimationFrame(() => resizeSubgoalTitles());
+                        setTimeout(() => resizeSubgoalTitles(), 150);
+                    })"
+                    x-on:subgoal-created.window="
+                        if (Number($event.detail.goalId) !== Number($el.dataset.goalId)) return;
+                        requestAnimationFrame(() => {
+                            const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] [data-subgoal-title]';
+                            const field = $el.querySelector(selector);
+                            if (!field) return;
+                            resizeSubgoalTitle(field);
+                            setTimeout(() => resizeSubgoalTitle(field), 150);
+                            field.focus();
+                            field.select();
+                        });
+                    "
+                    class="space-y-3">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 class="text-sm font-semibold text-slate-300">
+                            Подзадачи {{ $completedSubgoals }}/{{ $subgoals->count() }}
+                        </h3>
+                        <button
+                            type="button"
+                            wire:click="requestSubgoalCostsSync({{ $viewingGoal->id }})"
+                            class="inline-flex items-center justify-center px-3 py-1.5 rounded-xl border border-slate-600 text-xs font-medium text-slate-200 hover:bg-slate-700/60 hover:border-slate-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Посчитать рублевые суммы из подзадач и записать в целевую сумму"
+                            {{ $subgoals->isEmpty() ? 'disabled' : '' }}>
+                            Сумировать затраты
+                        </button>
+                    </div>
+
+                    <div
+                        data-subgoals-list
+                        class="rounded-2xl border border-slate-700 bg-slate-900/40 divide-y divide-slate-700">
+                        @forelse($subgoals as $subgoal)
+                            @php
+                                $subgoalId = (string) ($subgoal['id'] ?? '');
+                                $isDone = (bool) ($subgoal['is_done'] ?? false);
+                                $title = trim((string) preg_replace('/\s+/u', ' ', (string) ($subgoal['title'] ?? 'Новая подзадача')));
+                                $title = $title !== '' ? $title : 'Новая подзадача';
+                            @endphp
+                            <div
+                                data-subgoal-item
+                                data-subgoal-id="{{ $subgoalId }}"
+                                draggable="true"
+                                class="group flex items-center gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
+                                <span
+                                    data-subgoal-drag-handle
+                                    draggable="true"
+                                    class="select-none text-slate-500 hover:text-slate-300 px-1 py-1 rounded cursor-grab active:cursor-grabbing"
+                                    title="Перетащить">
+                                    &#8942;&#8942;
+                                </span>
+                                <button
+                                    type="button"
+                                    wire:click="toggleSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}')"
+                                    class="my-1 w-6 h-6 shrink-0 rounded-full border inline-flex items-center justify-center transition
+                                        {{ $isDone ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-500 text-transparent hover:border-slate-300 hover:text-slate-300' }}"
+                                    title="Переключить статус">
+                                    &#10003;
+                                </button>
+
+                                <textarea
+                                    data-subgoal-title
+                                    rows="1"
+                                    wrap="soft"
+                                    x-init="$nextTick(() => {
+                                        resizeSubgoalTitle($el);
+                                        requestAnimationFrame(() => resizeSubgoalTitle($el));
+                                        setTimeout(() => resizeSubgoalTitle($el), 150);
+                                    })"
+                                    x-on:input="resizeSubgoalTitle($el)"
+                                    @keydown.enter.prevent="$wire.saveSubgoalAndAddNext({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
+                                    @blur="$wire.renameSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}', $el.value)"
+                                    class="mt-[-4.5px] flex-1 min-w-0 resize-none overflow-hidden break-words bg-transparent text-sm leading-5 px-1 py-1 rounded-lg border border-transparent focus:border-indigo-400/70 focus:bg-slate-800/60 focus:outline-none {{ $isDone ? 'line-through text-slate-500' : 'text-slate-200' }}"
+                                    style="height: 1.75rem; min-height: 1.75rem; field-sizing: content;"
+                                    aria-label="Название подзадачи">{{ $title }}</textarea>
+
+                                <button
+                                    type="button"
+                                    wire:click="deleteSubgoal({{ $viewingGoal->id }}, '{{ $subgoalId }}')"
+                                    class="w-7 h-7 shrink-0 rounded-lg text-slate-500 hover:text-rose-300 hover:bg-rose-500/10 transition"
+                                    title="Удалить подзадачу">
+                                    &times;
+                                </button>
+                            </div>
+                        @empty
+                            <div class="px-3 py-3 text-xs text-slate-500">
+                                Пока нет подзадач
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="addSubgoal({{ $viewingGoal->id }})"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-500 text-slate-100 hover:bg-slate-700/50 transition">
+                        <span class="text-lg leading-none">+</span>
+                        <span class="text-xs font-medium">Подзадача</span>
+                    </button>
+                </div>
 
                 {{-- Финансовая информация --}}
                 @if($viewingGoal->target_amount > 0)
@@ -178,4 +303,82 @@
             </div>
         </div>
     </div>
+
+    @if($confirmSubgoalCostsGoalId === $viewingGoal->id)
+        <div class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70" wire:click="cancelSubgoalCostsSync"></div>
+            <div class="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-800 p-5 shadow-2xl">
+                <h3 class="text-base font-semibold text-slate-100">
+                    Перенести сумму затрат?
+                </h3>
+                <div class="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+                    <p>
+                        Система прочитает все подзадачи и найдёт рублёвые суммы вида
+                        <span class="text-slate-100">1000₽</span>,
+                        <span class="text-slate-100">1000руб</span> или
+                        <span class="text-slate-100">1000р</span>.
+                    </p>
+                    <p>
+                        Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит выбранное финансовое поле.
+                    </p>
+                    <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-1">
+                        <div class="grid grid-cols-2 gap-1">
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    wire:model.live="subgoalCostsDestination"
+                                    value="target"
+                                    class="peer sr-only">
+                                <span class="block rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-300 transition peer-checked:bg-indigo-500 peer-checked:text-white">
+                                    В цель
+                                </span>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    wire:model.live="subgoalCostsDestination"
+                                    value="saved"
+                                    class="peer sr-only">
+                                <span class="block rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-300 transition peer-checked:bg-emerald-500 peer-checked:text-white">
+                                    В достигнуто
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    @if($pendingSubgoalCostsCount > 0)
+                        <p class="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-slate-200">
+                            Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано в {{ $subgoalCostsDestination === 'saved' ? 'достигнуто' : 'цель' }}:
+                            <span class="font-semibold text-slate-100">
+                                {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
+                            </span>
+                        </p>
+                    @else
+                        <p class="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-amber-200">
+                            Рублёвые суммы не найдены. Целевая сумма не будет изменена.
+                        </p>
+                    @endif
+                    @if($viewingGoal->is_completed && $subgoalCostsDestination === 'target')
+                        <p class="text-amber-200">
+                            Цель уже выполнена, поэтому достигнутая сумма тоже будет обновлена до новой целевой суммы.
+                        </p>
+                    @endif
+                </div>
+                <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        wire:click="cancelSubgoalCostsSync"
+                        class="px-4 py-2 rounded-xl bg-slate-700 text-sm text-slate-100 hover:bg-slate-600 transition">
+                        Отмена
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="confirmSubgoalCostsSync"
+                        class="px-4 py-2 rounded-xl bg-indigo-500 text-sm font-semibold text-white hover:bg-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        {{ $pendingSubgoalCostsCount === 0 ? 'disabled' : '' }}>
+                        Подтвердить
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

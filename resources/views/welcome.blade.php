@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Цели</title>
+    <title>Цели | zchk0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="https://lvl.zchk.ru/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,5 +23,7 @@
     @livewireScripts
     <script src="{{ asset('js/modal-scroll-lock.js') }}" defer></script>
     <script src="{{ asset('js/goal-dnd.js') }}" defer></script>
+    <script src="{{ asset('js/subgoal-dnd.js') }}" defer></script>
+    <script src="{{ asset('js/subgoal-autosize.js') }}" defer></script>
 </body>
 </html>

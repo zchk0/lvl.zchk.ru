@@ -358,18 +358,18 @@
                     @if($pendingSubgoalCostsCount > 0)
                         <p class="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-slate-200">
                             @if($subgoalCostsDestination === 'split_done')
-                                Найдено сумм: {{ $pendingSubgoalCostsCount }}.
+                                Найдено сумм: {{ $pendingSubgoalCostsCount }}. <br>
                                 В цель:
                                 <span class="font-semibold text-slate-100">
                                     {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
-                                </span>,
-                                в достигнуто по выполненным:
+                                </span><br>
+                                В достигнуто по выполненным:
                                 <span class="font-semibold text-slate-100">
                                     {{ number_format(max(0, $pendingDoneSubgoalCostsTotal), 0, ',', ' ') }} ₽
                                 </span>
                                 <span class="text-slate-400">
                                     ({{ $pendingDoneSubgoalCostsCount }} из {{ $pendingSubgoalCostsCount }})
-                                </span>.
+                                </span>
                             @else
                                 Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано в {{ $subgoalCostsDestination === 'saved' ? 'достигнуто' : 'цель' }}:
                                 <span class="font-semibold text-slate-100">

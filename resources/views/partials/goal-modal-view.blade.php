@@ -115,11 +115,14 @@
                         ->sortBy('position')
                         ->values();
                     $completedSubgoals = $subgoals->where('is_done', true)->count();
+                    $visibleSubgoalsLimit = 8;
+                    $hiddenSubgoalsCount = max(0, $subgoals->count() - $visibleSubgoalsLimit);
                 @endphp
                 <div
                     data-subgoals-board
                     data-goal-id="{{ $viewingGoal->id }}"
                     x-data="{
+                        subgoalsExpanded: false,
                         resizeSubgoalTitle(field) {
                             if (!field) return;
                             field.style.height = '1.75rem';
@@ -136,6 +139,7 @@
                     })"
                     x-on:subgoal-created.window="
                         if (Number($event.detail.goalId) !== Number($el.dataset.goalId)) return;
+                        subgoalsExpanded = true;
                         requestAnimationFrame(() => {
                             const selector = '[data-subgoal-id=&quot;' + $event.detail.subgoalId + '&quot;] [data-subgoal-title]';
                             const field = $el.querySelector(selector);
@@ -170,10 +174,15 @@
                                 $isDone = (bool) ($subgoal['is_done'] ?? false);
                                 $title = trim((string) preg_replace('/\s+/u', ' ', (string) ($subgoal['title'] ?? 'Новая подзадача')));
                                 $title = $title !== '' ? $title : 'Новая подзадача';
+                                $isInitiallyHidden = $loop->index >= $visibleSubgoalsLimit;
                             @endphp
                             <div
                                 data-subgoal-item
                                 data-subgoal-id="{{ $subgoalId }}"
+                                @if($isInitiallyHidden)
+                                    x-show="subgoalsExpanded"
+                                    x-transition.opacity.duration.150ms
+                                @endif
                                 draggable="true"
                                 class="group flex items-center gap-2 px-3 py-2 {{ $isDone ? 'opacity-80' : '' }}">
                                 <span
@@ -221,6 +230,24 @@
                                 Пока нет подзадач
                             </div>
                         @endforelse
+                        @if($hiddenSubgoalsCount > 0)
+                            <button
+                                type="button"
+                                x-on:click="
+                                    subgoalsExpanded = !subgoalsExpanded;
+                                    if (subgoalsExpanded) {
+                                        $nextTick(() => resizeSubgoalTitles());
+                                    }
+                                "
+                                class="flex w-full items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800/70 hover:text-slate-100 transition">
+                                <span x-show="!subgoalsExpanded">
+                                    Показать ещё {{ $hiddenSubgoalsCount }}
+                                </span>
+                                <span x-show="subgoalsExpanded">
+                                    Свернуть
+                                </span>
+                            </button>
+                        @endif
                     </div>
 
                     <button

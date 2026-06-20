@@ -322,7 +322,7 @@
                         Суммы с минусом будут вычтены, остальные прибавлены. Итог заменит выбранное финансовое поле.
                     </p>
                     <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-1">
-                        <div class="grid grid-cols-2 gap-1">
+                        <div class="grid grid-cols-1 gap-1 sm:grid-cols-3">
                             <label class="cursor-pointer">
                                 <input
                                     type="radio"
@@ -343,14 +343,39 @@
                                     В достигнуто
                                 </span>
                             </label>
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    wire:model.live="subgoalCostsDestination"
+                                    value="split_done"
+                                    class="peer sr-only">
+                                <span class="block rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-300 transition peer-checked:bg-sky-500 peer-checked:text-white">
+                                    Разделить
+                                </span>
+                            </label>
                         </div>
                     </div>
                     @if($pendingSubgoalCostsCount > 0)
                         <p class="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-slate-200">
-                            Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано в {{ $subgoalCostsDestination === 'saved' ? 'достигнуто' : 'цель' }}:
-                            <span class="font-semibold text-slate-100">
-                                {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
-                            </span>
+                            @if($subgoalCostsDestination === 'split_done')
+                                Найдено сумм: {{ $pendingSubgoalCostsCount }}.
+                                В цель:
+                                <span class="font-semibold text-slate-100">
+                                    {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
+                                </span>,
+                                в достигнуто по выполненным:
+                                <span class="font-semibold text-slate-100">
+                                    {{ number_format(max(0, $pendingDoneSubgoalCostsTotal), 0, ',', ' ') }} ₽
+                                </span>
+                                <span class="text-slate-400">
+                                    ({{ $pendingDoneSubgoalCostsCount }} из {{ $pendingSubgoalCostsCount }})
+                                </span>.
+                            @else
+                                Найдено сумм: {{ $pendingSubgoalCostsCount }}. Будет записано в {{ $subgoalCostsDestination === 'saved' ? 'достигнуто' : 'цель' }}:
+                                <span class="font-semibold text-slate-100">
+                                    {{ number_format(max(0, $pendingSubgoalCostsTotal), 0, ',', ' ') }} ₽
+                                </span>
+                            @endif
                         </p>
                     @else
                         <p class="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-amber-200">

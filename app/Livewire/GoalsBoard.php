@@ -17,6 +17,8 @@ class GoalsBoard extends Component
     public ?int $confirmSubgoalCostsGoalId = null;
     public float $pendingSubgoalCostsTotal = 0.0;
     public int $pendingSubgoalCostsCount = 0;
+    public float $pendingDoneSubgoalCostsTotal = 0.0;
+    public int $pendingDoneSubgoalCostsCount = 0;
     public string $subgoalCostsDestination = 'target';
 
     // Синхронизируем с URL: ?priority=1|2|3|4|all
@@ -484,11 +486,13 @@ class GoalsBoard extends Component
     public function requestSubgoalCostsSync(int $goalId): void
     {
         $goal = $this->findGoalForCurrentBoard($goalId);
-        [$total, $count] = $this->calculateSubgoalCosts($goal);
+        [$total, $count, $doneTotal, $doneCount] = $this->calculateSubgoalCosts($goal);
 
         $this->confirmSubgoalCostsGoalId = $goalId;
         $this->pendingSubgoalCostsTotal = $total;
         $this->pendingSubgoalCostsCount = $count;
+        $this->pendingDoneSubgoalCostsTotal = $doneTotal;
+        $this->pendingDoneSubgoalCostsCount = $doneCount;
         $this->subgoalCostsDestination = 'target';
     }
 
@@ -512,7 +516,7 @@ class GoalsBoard extends Component
     public function syncSubgoalCostsToGoal(int $goalId, string $destination = 'target'): void
     {
         $goal = $this->findGoalForCurrentBoard($goalId);
-        [$total, $count] = $this->calculateSubgoalCosts($goal);
+        [$total, $count, $doneTotal] = $this->calculateSubgoalCosts($goal);
 
         if ($count === 0) {
             return;
@@ -520,7 +524,10 @@ class GoalsBoard extends Component
 
         $amount = max(0, $total);
 
-        if ($destination === 'saved') {
+        if ($destination === 'split_done') {
+            $goal->target_amount = $amount;
+            $goal->saved_amount = max(0, $doneTotal);
+        } elseif ($destination === 'saved') {
             $goal->saved_amount = $amount;
         } else {
             $goal->target_amount = $amount;
@@ -640,6 +647,8 @@ class GoalsBoard extends Component
         $this->confirmSubgoalCostsGoalId = null;
         $this->pendingSubgoalCostsTotal = 0.0;
         $this->pendingSubgoalCostsCount = 0;
+        $this->pendingDoneSubgoalCostsTotal = 0.0;
+        $this->pendingDoneSubgoalCostsCount = 0;
         $this->subgoalCostsDestination = 'target';
     }
 
@@ -648,14 +657,21 @@ class GoalsBoard extends Component
         $subgoals = $this->normalizeSubgoals($goal->subgoals);
         $total = 0.0;
         $count = 0;
+        $doneTotal = 0.0;
+        $doneCount = 0;
 
         foreach ($subgoals as $subgoal) {
             [$subgoalTotal, $subgoalCount] = $this->sumRubleAmounts((string) ($subgoal['title'] ?? ''));
             $total += $subgoalTotal;
             $count += $subgoalCount;
+
+            if ((bool) ($subgoal['is_done'] ?? false)) {
+                $doneTotal += $subgoalTotal;
+                $doneCount += $subgoalCount;
+            }
         }
 
-        return [$total, $count];
+        return [$total, $count, $doneTotal, $doneCount];
     }
 
     private function normalizeSubgoals(mixed $subgoals, bool $sortByPosition = true): array

@@ -322,6 +322,28 @@
             text-decoration: line-through;
         }
 
+        .subgoals-item.is-collapsed {
+            display: none;
+        }
+
+        .subgoals-toggle {
+            width: 100%;
+            border: 0;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            padding: 12px 14px;
+            color: #cbd5e1;
+            background: rgba(15, 23, 42, 0.35);
+            font: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .subgoals-toggle:hover {
+            color: #f8fafc;
+            background: rgba(15, 23, 42, 0.65);
+        }
+
         .footer {
             text-align: center;
             color: var(--muted);
@@ -392,6 +414,8 @@
             ->sortBy('position')
             ->values();
         $doneSubgoals = $subgoals->where('is_done', true)->count();
+        $visibleSubgoalsLimit = 8;
+        $hiddenSubgoalsCount = max(0, $subgoals->count() - $visibleSubgoalsLimit);
     @endphp
 
     <main class="page">
@@ -427,12 +451,25 @@
                         @php
                             $isDone = (bool) ($subgoal['is_done'] ?? false);
                             $title = (string) ($subgoal['title'] ?? 'Подзадача');
+                            $isInitiallyHidden = $loop->index >= $visibleSubgoalsLimit;
                         @endphp
-                        <li class="subgoals-item {{ $isDone ? 'is-done' : '' }}">
+                        <li class="subgoals-item {{ $isDone ? 'is-done' : '' }} {{ $isInitiallyHidden ? 'is-collapsed' : '' }}" @if($isInitiallyHidden) data-subgoal-collapsed @endif>
                             <span class="subgoals-marker" aria-hidden="true">{{ $isDone ? '✓' : '' }}</span>
                             <span class="subgoals-title">{{ $title }}</span>
                         </li>
                     @endforeach
+                    @if($hiddenSubgoalsCount > 0)
+                        <li>
+                            <button
+                                type="button"
+                                class="subgoals-toggle"
+                                data-subgoals-toggle
+                                data-show-label="Показать ещё {{ $hiddenSubgoalsCount }}"
+                                data-hide-label="Свернуть">
+                                Показать ещё {{ $hiddenSubgoalsCount }}
+                            </button>
+                        </li>
+                    @endif
                 </ul>
             </section>
         @endif
@@ -475,5 +512,21 @@
 
         <div class="footer">Карточка доступна по этой ссылке, пока она публичная.</div>
     </main>
+    <script>
+        document.querySelectorAll('[data-subgoals-toggle]').forEach((button) => {
+            const list = button.closest('.subgoals-list');
+            if (!list) {
+                return;
+            }
+
+            const collapsedItems = list.querySelectorAll('[data-subgoal-collapsed]');
+            button.addEventListener('click', () => {
+                const shouldExpand = button.getAttribute('aria-expanded') !== 'true';
+                collapsedItems.forEach((item) => item.classList.toggle('is-collapsed', !shouldExpand));
+                button.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+                button.textContent = shouldExpand ? button.dataset.hideLabel : button.dataset.showLabel;
+            });
+        });
+    </script>
 </body>
 </html>

@@ -23,8 +23,6 @@ services:
       APP_LOCALE: "ru"
       APP_FALLBACK_LOCALE: "ru"
 
-      PIN_COOKIE_NAME: "pin_ok"
-      PIN_COOKIE_MINUTES: "60"
       BCRYPT_ROUNDS: "12"
     volumes:
       - ./:/var/www/html

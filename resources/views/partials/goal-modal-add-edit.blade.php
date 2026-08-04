@@ -188,14 +188,13 @@
                             ? 'Описание в формате Markdown...'
                             : (descriptionFormat === 'html' ? 'Описание в формате HTML...' : 'Подробное описание цели...')"
                         x-bind:class="[
-                            descriptionFormat === 'raw' ? '' : 'font-mono',
                             descriptionFullscreen
                                 ? 'flex-1 min-h-0 !resize-none !border-slate-600 !bg-slate-900 !px-5 !py-4 !text-[14.5px] shadow-2xl shadow-black/30'
                                 : '',
                         ]"
                         rows="7"
                         wire:model.defer="description"
-                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
+                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-[13.5px] font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
 
                     <p
                         x-bind:class="descriptionFullscreen ? 'mt-3 px-2' : 'mt-1.5'"

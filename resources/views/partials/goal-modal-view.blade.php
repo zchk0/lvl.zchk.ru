@@ -14,8 +14,11 @@
             <button
                 type="button"
                 wire:click="closeViewModal"
-                class="absolute top-4 right-4 inline-flex h-9 w-9 items-center justify-center rounded-xl text-2xl leading-none text-slate-400 hover:bg-slate-700/60 hover:text-slate-200 transition">
-                &times;
+                aria-label="Закрыть"
+                class="absolute top-6 right-4 inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-700/60 hover:text-slate-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M18 6L6 18" />
+                </svg>
             </button>
 
             <div class="space-y-6">

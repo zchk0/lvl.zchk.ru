@@ -14,7 +14,7 @@
             <button
                 type="button"
                 wire:click="closeViewModal"
-                class="absolute top-6 right-6 text-slate-400 hover:text-slate-200 text-2xl leading-none">
+                class="absolute top-4 right-4 inline-flex h-9 w-9 items-center justify-center rounded-xl text-2xl leading-none text-slate-400 hover:bg-slate-700/60 hover:text-slate-200 transition">
                 &times;
             </button>
 
@@ -22,7 +22,7 @@
                 {{-- Заголовок и статус --}}
                 <div>
                     <div class="flex items-start justify-between gap-4 mb-3">
-                        <h2 class="text-2xl font-bold text-slate-100 {{ $viewingGoal->is_completed ? 'line-through text-slate-400' : '' }}">
+                        <h2 class="min-w-0 pr-12 sm:pr-14 text-2xl font-bold text-slate-100 break-words {{ $viewingGoal->is_completed ? 'line-through text-slate-400' : '' }}">
                             {{ $viewingGoal->title }}
                         </h2>
                     </div>

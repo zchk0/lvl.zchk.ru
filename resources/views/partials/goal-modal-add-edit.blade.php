@@ -40,6 +40,7 @@
                 <div
                     x-data="{
                         descriptionFormat: $wire.entangle('description_format'),
+                        descriptionFullscreen: false,
                         applyDescriptionFormat(command) {
                             if (this.descriptionFormat === 'raw') return;
 
@@ -105,24 +106,46 @@
                             editor.dispatchEvent(new Event('input', { bubbles: true }));
                             editor.focus();
                         },
-                    }">
+                    }"
+                    x-on:keydown.escape="
+                        if (descriptionFullscreen) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+                            descriptionFullscreen = false;
+                        }
+                    "
+                    x-bind:class="descriptionFullscreen
+                        ? 'fixed inset-0 z-[60] !m-0 flex flex-col overflow-hidden bg-slate-900 p-4 sm:p-6'
+                        : ''">
                     <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
                         <label for="goal-description" class="block text-sm">Описание</label>
 
-                        <div class="inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат редактора">
-                            @foreach(['raw' => 'RAW', 'markdown' => 'Markdown', 'html' => 'HTML'] as $format => $label)
-                                <button
-                                    type="button"
-                                    role="tab"
-                                    x-on:click="descriptionFormat = '{{ $format }}'"
-                                    x-bind:aria-selected="descriptionFormat === '{{ $format }}'"
-                                    x-bind:class="descriptionFormat === '{{ $format }}'
-                                        ? 'bg-indigo-500/25 text-indigo-100 shadow-sm'
-                                        : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'"
-                                    class="rounded-lg px-3 py-1.5 text-xs font-medium transition">
-                                    {{ $label }}
-                                </button>
-                            @endforeach
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат редактора">
+                                @foreach(['raw' => 'RAW', 'markdown' => 'Markdown', 'html' => 'HTML'] as $format => $label)
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        x-on:click="descriptionFormat = '{{ $format }}'"
+                                        x-bind:aria-selected="descriptionFormat === '{{ $format }}'"
+                                        x-bind:class="descriptionFormat === '{{ $format }}'
+                                            ? 'bg-indigo-500/25 text-indigo-100 shadow-sm'
+                                            : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'"
+                                        class="rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                                        {{ $label }}
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            <button
+                                type="button"
+                                x-on:click="descriptionFullscreen = !descriptionFullscreen; $nextTick(() => $refs.descriptionEditor.focus())"
+                                x-bind:aria-pressed="descriptionFullscreen"
+                                x-bind:title="descriptionFullscreen ? 'Свернуть редактор' : 'Развернуть редактор на весь экран'"
+                                class="inline-flex items-center gap-1.5 rounded-xl border border-slate-600 bg-slate-900/50 px-3 py-2 text-xs font-medium text-slate-300 hover:border-slate-500 hover:bg-slate-700/60 hover:text-white transition">
+                                <span aria-hidden="true" class="text-base leading-none">⛶</span>
+                                <span x-text="descriptionFullscreen ? 'Свернуть' : 'На весь экран'"></span>
+                            </button>
                         </div>
                     </div>
 
@@ -157,7 +180,10 @@
                         x-bind:placeholder="descriptionFormat === 'markdown'
                             ? 'Описание в формате Markdown...'
                             : (descriptionFormat === 'html' ? 'Описание в формате HTML...' : 'Подробное описание цели...')"
-                        x-bind:class="descriptionFormat === 'raw' ? '' : 'font-mono'"
+                        x-bind:class="[
+                            descriptionFormat === 'raw' ? '' : 'font-mono',
+                            descriptionFullscreen ? 'flex-1 min-h-0 resize-none' : '',
+                        ]"
                         rows="7"
                         wire:model.defer="description"
                         class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>

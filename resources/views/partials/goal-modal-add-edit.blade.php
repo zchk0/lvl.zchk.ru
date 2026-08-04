@@ -115,9 +115,13 @@
                         }
                     "
                     x-bind:class="descriptionFullscreen
-                        ? 'fixed inset-0 z-[60] !m-0 flex flex-col overflow-hidden bg-slate-900 p-4 sm:p-6'
+                        ? 'fixed inset-0 z-[60] !m-0 flex flex-col overflow-hidden bg-slate-950 p-6 sm:p-8 lg:p-10'
                         : ''">
-                    <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div
+                        x-bind:class="descriptionFullscreen
+                            ? 'mb-4 rounded-2xl border border-slate-700 bg-slate-800/90 p-3 shadow-lg shadow-black/20'
+                            : 'mb-2'"
+                        class="flex flex-wrap items-center justify-between gap-3">
                         <label for="goal-description" class="block text-sm">Описание</label>
 
                         <div class="flex flex-wrap items-center gap-2">
@@ -152,7 +156,10 @@
                     <div
                         x-show="descriptionFormat !== 'raw'"
                         style="display: none;"
-                        class="mb-2 flex flex-wrap gap-1 rounded-xl border border-slate-700 bg-slate-900/40 p-1.5"
+                        x-bind:class="descriptionFullscreen
+                            ? 'mb-4 border-slate-600 bg-slate-800/80 p-2.5 shadow-lg shadow-black/20'
+                            : 'mb-2 border-slate-700 bg-slate-900/40 p-1.5'"
+                        class="flex flex-wrap gap-1 rounded-xl border"
                         aria-label="Форматирование текста">
                         @foreach([
                             'heading' => ['H2', 'Заголовок'],
@@ -182,13 +189,17 @@
                             : (descriptionFormat === 'html' ? 'Описание в формате HTML...' : 'Подробное описание цели...')"
                         x-bind:class="[
                             descriptionFormat === 'raw' ? '' : 'font-mono',
-                            descriptionFullscreen ? 'flex-1 min-h-0 resize-none' : '',
+                            descriptionFullscreen
+                                ? 'flex-1 min-h-0 !resize-none !border-slate-600 !bg-slate-900 !px-5 !py-4 !text-base shadow-2xl shadow-black/30'
+                                : '',
                         ]"
                         rows="7"
                         wire:model.defer="description"
                         class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
 
-                    <p class="mt-1.5 text-xs text-slate-500">
+                    <p
+                        x-bind:class="descriptionFullscreen ? 'mt-3 px-2' : 'mt-1.5'"
+                        class="text-xs text-slate-500">
                         <span x-show="descriptionFormat === 'raw'">Обычный текст без разметки.</span>
                         <span x-show="descriptionFormat === 'markdown'" style="display: none;">Панель вставляет Markdown-разметку в выделенный текст.</span>
                         <span x-show="descriptionFormat === 'html'" style="display: none;">Панель вставляет HTML-теги в выделенный текст.</span>

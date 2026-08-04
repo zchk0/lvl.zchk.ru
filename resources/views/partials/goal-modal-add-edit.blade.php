@@ -53,7 +53,6 @@
                                 const inline = {
                                     bold: ['**', '**', 'жирный текст'],
                                     italic: ['_', '_', 'курсив'],
-                                    code: ['`', '`', 'код'],
                                 };
 
                                 if (inline[command]) {
@@ -72,6 +71,8 @@
                                 } else if (command === 'quote') {
                                     replacement = (selected || 'цитата')
                                         .split('\n').map(line => '> ' + line).join('\n');
+                                } else if (command === 'code') {
+                                    replacement = '```\n' + (selected || 'код') + '\n```';
                                 }
                             }
 

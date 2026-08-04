@@ -141,7 +141,9 @@
                             [&_code]:rounded [&_code]:bg-slate-950 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-xs
                             [&_pre]:mb-3 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-slate-950 [&_pre]:p-3
                             [&_pre_code]:bg-transparent [&_pre_code]:p-0">
-                        {!! Illuminate\Support\Str::markdown($viewingGoal->description) !!}
+                        {!! Illuminate\Support\Str::markdown($viewingGoal->description, [
+                            'renderer' => ['soft_break' => "<br>\n"],
+                        ]) !!}
                     </div>
 
                     <div

@@ -197,6 +197,86 @@
             line-height: 1.6;
         }
 
+        .description-content {
+            color: #d1d5db;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .description-content > :first-child {
+            margin-top: 0;
+        }
+
+        .description-content > :last-child {
+            margin-bottom: 0;
+        }
+
+        .description-content p,
+        .description-content ul,
+        .description-content ol,
+        .description-content blockquote,
+        .description-content pre {
+            margin: 0 0 14px;
+        }
+
+        .description-content h1,
+        .description-content h2,
+        .description-content h3 {
+            margin: 20px 0 10px;
+            color: var(--text);
+            letter-spacing: normal;
+            line-height: 1.3;
+            text-transform: none;
+        }
+
+        .description-content h1 {
+            font-size: 24px;
+        }
+
+        .description-content h2 {
+            font-size: 20px;
+        }
+
+        .description-content h3 {
+            font-size: 17px;
+        }
+
+        .description-content ul,
+        .description-content ol {
+            padding-left: 24px;
+        }
+
+        .description-content a {
+            color: var(--accent-2);
+            text-underline-offset: 3px;
+        }
+
+        .description-content blockquote {
+            padding-left: 14px;
+            border-left: 3px solid rgba(34, 211, 238, 0.45);
+            color: var(--muted);
+        }
+
+        .description-content code {
+            padding: 2px 5px;
+            border-radius: 6px;
+            background: rgba(2, 6, 23, 0.8);
+            font-size: 0.9em;
+        }
+
+        .description-content pre {
+            padding: 14px;
+            overflow-x: auto;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 14px;
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .description-content pre code {
+            padding: 0;
+            background: transparent;
+        }
+
         .progress-header {
             display: flex;
             align-items: baseline;
@@ -416,6 +496,9 @@
         $doneSubgoals = $subgoals->where('is_done', true)->count();
         $visibleSubgoalsLimit = 8;
         $hiddenSubgoalsCount = max(0, $subgoals->count() - $visibleSubgoalsLimit);
+        $descriptionFormat = in_array($goal->description_format, \App\Models\Goal::DESCRIPTION_FORMATS, true)
+            ? $goal->description_format
+            : 'raw';
     @endphp
 
     <main class="page">
@@ -436,7 +519,17 @@
         @if($goal->description)
             <section class="panel">
                 <h2>Описание</h2>
-                <p>{!! nl2br(e($goal->description)) !!}</p>
+                <div class="description-content">
+                    @if($descriptionFormat === 'markdown')
+                        {!! Illuminate\Support\Str::markdown($goal->description, [
+                            'renderer' => ['soft_break' => "<br>\n"],
+                        ]) !!}
+                    @elseif($descriptionFormat === 'html')
+                        {!! $goal->description !!}
+                    @else
+                        {!! nl2br(e($goal->description)) !!}
+                    @endif
+                </div>
             </section>
         @endif
 

@@ -88,6 +88,9 @@ class ImportGoalsCommand extends Command
                         'title' => $item['title'] ?? 'Без названия',
                         'url' => $item['url'] ?? null,
                         'description' => $item['description'] ?? '',
+                        'description_format' => isset($item['description_format']) && in_array($item['description_format'], Goal::DESCRIPTION_FORMATS, true)
+                            ? $item['description_format']
+                            : 'raw',
                         'subgoals' => isset($item['subgoals']) && is_array($item['subgoals']) ? $item['subgoals'] : [],
                         'author_name' => $item['author_name'] ?? null,
                         'target_amount' => isset($item['target_amount']) ? (float) $item['target_amount'] : 0,

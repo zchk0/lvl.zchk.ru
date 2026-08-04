@@ -50,6 +50,9 @@ class ExportGoalsCommand extends Command
                 'title' => $goal->title,
                 'url' => $goal->url,
                 'description' => $goal->description ?? '',
+                'description_format' => in_array($goal->description_format, Goal::DESCRIPTION_FORMATS, true)
+                    ? $goal->description_format
+                    : 'raw',
                 'subgoals' => is_array($goal->subgoals) ? $goal->subgoals : [],
                 'author_name' => $goal->author_name,
                 'target_amount' => (float) $goal->target_amount,

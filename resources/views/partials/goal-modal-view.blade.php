@@ -101,7 +101,12 @@
 
                 {{-- Описание --}}
                 @if($viewingGoal->description)
-                <div x-data="{ descriptionFormat: 'raw' }">
+                @php
+                    $initialDescriptionFormat = in_array($viewingGoal->description_format, \App\Models\Goal::DESCRIPTION_FORMATS, true)
+                        ? $viewingGoal->description_format
+                        : 'raw';
+                @endphp
+                <div x-data="{ descriptionFormat: '{{ $initialDescriptionFormat }}' }">
                     <h3 class="text-sm font-semibold text-slate-300 mb-2">Описание</h3>
 
                     <div class="mb-2 inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат описания">
@@ -123,7 +128,7 @@
                     <div
                         x-show="descriptionFormat === 'markdown'"
                         role="tabpanel"
-                        style="display: none;"
+                        @style(['display: none' => $initialDescriptionFormat !== 'markdown'])
                         class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4 break-words
                             [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-bold
                             [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold
@@ -142,7 +147,7 @@
                     <div
                         x-show="descriptionFormat === 'html'"
                         role="tabpanel"
-                        style="display: none;"
+                        @style(['display: none' => $initialDescriptionFormat !== 'html'])
                         class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4 break-words">
                         {!! $viewingGoal->description !!}
                     </div>
@@ -150,6 +155,7 @@
                     <pre
                         x-show="descriptionFormat === 'raw'"
                         role="tabpanel"
+                        @style(['display: none' => $initialDescriptionFormat !== 'raw'])
                         class="overflow-x-auto whitespace-pre-wrap break-words text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4"><code>{{ $viewingGoal->description }}</code></pre>
                 </div>
                 @endif

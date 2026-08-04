@@ -39,7 +39,7 @@
 
                 <div
                     x-data="{
-                        descriptionFormat: 'raw',
+                        descriptionFormat: $wire.entangle('description_format'),
                         applyDescriptionFormat(command) {
                             if (this.descriptionFormat === 'raw') return;
 

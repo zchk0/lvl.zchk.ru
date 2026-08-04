@@ -36,6 +36,7 @@ class GoalsBoard extends Component
 
     public string $title = '';
     public string $description = '';
+    public string $description_format = 'raw';
     public string $url = '';
     public string $author_name = '';
     public string $target_amount = '';
@@ -112,6 +113,9 @@ class GoalsBoard extends Component
         $this->editingId = $goal->id;
         $this->title = $goal->title;
         $this->description = $goal->description ?? '';
+        $this->description_format = in_array($goal->description_format, Goal::DESCRIPTION_FORMATS, true)
+            ? $goal->description_format
+            : 'raw';
         $this->url = $goal->url ?? '';
         $this->author_name = (string) $goal->author_name;
         $this->target_amount = (string) $goal->target_amount;
@@ -127,6 +131,7 @@ class GoalsBoard extends Component
         $this->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'description_format' => ['required', 'string', 'in:raw,markdown,html'],
             'url' => ['nullable', 'string'],
             'author_name' => ['nullable', 'string', 'max:255'],
             'target_amount' => ['nullable', 'numeric', 'min:0'],
@@ -138,6 +143,7 @@ class GoalsBoard extends Component
         $data = [
             'title' => $this->title,
             'description' => $this->description ?: null,
+            'description_format' => $this->description_format,
             'url' => $this->url,
             'author_name' => $this->author_name ?: null,
             'target_amount' => $this->target_amount === '' ? 0 : (float) $this->target_amount,
@@ -603,6 +609,7 @@ class GoalsBoard extends Component
         $this->editingId = null;
         $this->title = '';
         $this->description = '';
+        $this->description_format = 'raw';
         $this->url = '';
         $this->author_name = '';
         $this->target_amount = '';

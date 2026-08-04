@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Goal extends Model
 {
+    public const DESCRIPTION_FORMATS = ['raw', 'markdown', 'html'];
+
     protected $fillable = [
         'board_id',
         'title',
         'description',
+        'description_format',
         'subgoals',
         'url',
         'author_name',

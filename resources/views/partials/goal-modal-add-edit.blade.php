@@ -141,10 +141,10 @@
                                 type="button"
                                 x-on:click="descriptionFullscreen = !descriptionFullscreen; $nextTick(() => $refs.descriptionEditor.focus())"
                                 x-bind:aria-pressed="descriptionFullscreen"
+                                x-bind:aria-label="descriptionFullscreen ? 'Свернуть редактор' : 'Развернуть редактор на весь экран'"
                                 x-bind:title="descriptionFullscreen ? 'Свернуть редактор' : 'Развернуть редактор на весь экран'"
-                                class="inline-flex items-center gap-1.5 rounded-xl border border-slate-600 bg-slate-900/50 px-3 py-2 text-xs font-medium text-slate-300 hover:border-slate-500 hover:bg-slate-700/60 hover:text-white transition">
+                                class="inline-flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl border border-slate-600 bg-slate-900/50 p-0 text-slate-300 hover:border-slate-500 hover:bg-slate-700/60 hover:text-white transition">
                                 <span aria-hidden="true" class="text-base leading-none">⛶</span>
-                                <span x-text="descriptionFullscreen ? 'Свернуть' : 'На весь экран'"></span>
                             </button>
                         </div>
                     </div>

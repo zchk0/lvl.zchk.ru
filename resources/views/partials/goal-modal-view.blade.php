@@ -101,11 +101,56 @@
 
                 {{-- Описание --}}
                 @if($viewingGoal->description)
-                <div>
+                <div x-data="{ descriptionFormat: 'markdown' }">
                     <h3 class="text-sm font-semibold text-slate-300 mb-2">Описание</h3>
-                    <p class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4">
-                        {!! nl2br($viewingGoal->description) !!}
-                    </p>
+
+                    <div class="mb-2 inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат описания">
+                        @foreach(['markdown' => 'Markdown', 'html' => 'HTML', 'raw' => 'RAW'] as $format => $label)
+                            <button
+                                type="button"
+                                role="tab"
+                                x-on:click="descriptionFormat = '{{ $format }}'"
+                                x-bind:aria-selected="descriptionFormat === '{{ $format }}'"
+                                x-bind:class="descriptionFormat === '{{ $format }}'
+                                    ? 'bg-indigo-500/25 text-indigo-100 shadow-sm'
+                                    : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'"
+                                class="rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                                {{ $label }}
+                            </button>
+                        @endforeach
+                    </div>
+
+                    <div
+                        x-show="descriptionFormat === 'markdown'"
+                        role="tabpanel"
+                        class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4 break-words
+                            [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-bold
+                            [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold
+                            [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold
+                            [&_p]:mb-3 [&_p:last-child]:mb-0
+                            [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:pl-5
+                            [&_ol]:mb-3 [&_ol]:list-decimal [&_ol]:pl-5
+                            [&_li]:mb-1 [&_a]:text-indigo-300 [&_a]:underline [&_a]:underline-offset-2
+                            [&_blockquote]:mb-3 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-600 [&_blockquote]:pl-3 [&_blockquote]:text-slate-400
+                            [&_code]:rounded [&_code]:bg-slate-950 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-xs
+                            [&_pre]:mb-3 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-slate-950 [&_pre]:p-3
+                            [&_pre_code]:bg-transparent [&_pre_code]:p-0">
+                        {!! Illuminate\Support\Str::markdown($viewingGoal->description) !!}
+                    </div>
+
+                    <div
+                        x-show="descriptionFormat === 'html'"
+                        role="tabpanel"
+                        style="display: none;"
+                        class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4 break-words">
+                        {!! $viewingGoal->description !!}
+                    </div>
+
+                    <pre
+                        x-show="descriptionFormat === 'raw'"
+                        role="tabpanel"
+                        style="display: none;"
+                        class="overflow-x-auto whitespace-pre-wrap break-words text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4"><code>{{ $viewingGoal->description }}</code></pre>
                 </div>
                 @endif
 

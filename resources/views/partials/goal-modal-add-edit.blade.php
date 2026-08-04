@@ -159,7 +159,7 @@
                         x-bind:class="descriptionFullscreen
                             ? 'mb-4 border-slate-600 bg-slate-800/80 p-2.5 shadow-lg shadow-black/20'
                             : 'mb-2 border-slate-700 bg-slate-900/40 p-1.5'"
-                        class="flex flex-wrap gap-1 rounded-xl border"
+                        class="flex flex-wrap gap-1.5 rounded-xl border"
                         aria-label="Форматирование текста">
                         @foreach([
                             'heading' => ['H2', 'Заголовок'],
@@ -175,7 +175,7 @@
                                 type="button"
                                 x-on:click="applyDescriptionFormat('{{ $command }}')"
                                 title="{{ $title }}"
-                                class="min-w-8 rounded-lg px-2 py-1 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition">
+                                class="min-w-8 rounded-lg border border-slate-600/80 bg-slate-900/35 px-2.5 py-1.5 text-xs font-medium text-slate-300 shadow-sm hover:border-slate-500 hover:bg-slate-700 hover:text-white transition">
                                 {{ $label }}
                             </button>
                         @endforeach
@@ -190,12 +190,12 @@
                         x-bind:class="[
                             descriptionFormat === 'raw' ? '' : 'font-mono',
                             descriptionFullscreen
-                                ? 'flex-1 min-h-0 !resize-none !border-slate-600 !bg-slate-900 !px-5 !py-4 !text-base shadow-2xl shadow-black/30'
+                                ? 'flex-1 min-h-0 !resize-none !border-slate-600 !bg-slate-900 !px-5 !py-4 !text-[15px] shadow-2xl shadow-black/30'
                                 : '',
                         ]"
                         rows="7"
                         wire:model.defer="description"
-                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
+                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-[13px] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
 
                     <p
                         x-bind:class="descriptionFullscreen ? 'mt-3 px-2' : 'mt-1.5'"

@@ -101,11 +101,11 @@
 
                 {{-- Описание --}}
                 @if($viewingGoal->description)
-                <div x-data="{ descriptionFormat: 'markdown' }">
+                <div x-data="{ descriptionFormat: 'raw' }">
                     <h3 class="text-sm font-semibold text-slate-300 mb-2">Описание</h3>
 
                     <div class="mb-2 inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат описания">
-                        @foreach(['markdown' => 'Markdown', 'html' => 'HTML', 'raw' => 'RAW'] as $format => $label)
+                        @foreach(['raw' => 'RAW', 'markdown' => 'Markdown', 'html' => 'HTML'] as $format => $label)
                             <button
                                 type="button"
                                 role="tab"
@@ -123,6 +123,7 @@
                     <div
                         x-show="descriptionFormat === 'markdown'"
                         role="tabpanel"
+                        style="display: none;"
                         class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4 break-words
                             [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-bold
                             [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold
@@ -149,7 +150,6 @@
                     <pre
                         x-show="descriptionFormat === 'raw'"
                         role="tabpanel"
-                        style="display: none;"
                         class="overflow-x-auto whitespace-pre-wrap break-words text-sm text-slate-300 leading-relaxed bg-slate-900/50 rounded-2xl p-4"><code>{{ $viewingGoal->description }}</code></pre>
                 </div>
                 @endif

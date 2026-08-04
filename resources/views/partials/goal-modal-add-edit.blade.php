@@ -37,13 +37,135 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm mb-1">Описание</label>
+                <div
+                    x-data="{
+                        descriptionFormat: 'raw',
+                        applyDescriptionFormat(command) {
+                            if (this.descriptionFormat === 'raw') return;
+
+                            const editor = this.$refs.descriptionEditor;
+                            const start = editor.selectionStart;
+                            const end = editor.selectionEnd;
+                            const selected = editor.value.slice(start, end);
+                            let replacement = selected;
+
+                            if (this.descriptionFormat === 'markdown') {
+                                const inline = {
+                                    bold: ['**', '**', 'жирный текст'],
+                                    italic: ['_', '_', 'курсив'],
+                                    code: ['`', '`', 'код'],
+                                };
+
+                                if (inline[command]) {
+                                    const [before, after, placeholder] = inline[command];
+                                    replacement = before + (selected || placeholder) + after;
+                                } else if (command === 'heading') {
+                                    replacement = '## ' + (selected || 'Заголовок');
+                                } else if (command === 'link') {
+                                    replacement = '[' + (selected || 'текст ссылки') + '](https://)';
+                                } else if (command === 'bulletList') {
+                                    replacement = (selected || 'элемент списка')
+                                        .split('\n').map(line => '- ' + line).join('\n');
+                                } else if (command === 'numberedList') {
+                                    replacement = (selected || 'элемент списка')
+                                        .split('\n').map((line, index) => (index + 1) + '. ' + line).join('\n');
+                                } else if (command === 'quote') {
+                                    replacement = (selected || 'цитата')
+                                        .split('\n').map(line => '> ' + line).join('\n');
+                                }
+                            }
+
+                            if (this.descriptionFormat === 'html') {
+                                const inline = {
+                                    bold: ['<strong>', '</strong>', 'жирный текст'],
+                                    italic: ['<em>', '</em>', 'курсив'],
+                                    code: ['<code>', '</code>', 'код'],
+                                };
+
+                                if (inline[command]) {
+                                    const [before, after, placeholder] = inline[command];
+                                    replacement = before + (selected || placeholder) + after;
+                                } else if (command === 'heading') {
+                                    replacement = '<h2>' + (selected || 'Заголовок') + '</h2>';
+                                } else if (command === 'link') {
+                                    replacement = '<a href=&quot;https://&quot;>' + (selected || 'текст ссылки') + '</a>';
+                                } else if (command === 'bulletList') {
+                                    replacement = '<ul>\n' + (selected || 'элемент списка')
+                                        .split('\n').map(line => '  <li>' + line + '</li>').join('\n') + '\n</ul>';
+                                } else if (command === 'numberedList') {
+                                    replacement = '<ol>\n' + (selected || 'элемент списка')
+                                        .split('\n').map(line => '  <li>' + line + '</li>').join('\n') + '\n</ol>';
+                                } else if (command === 'quote') {
+                                    replacement = '<blockquote>' + (selected || 'цитата') + '</blockquote>';
+                                }
+                            }
+
+                            editor.setRangeText(replacement, start, end, 'end');
+                            editor.dispatchEvent(new Event('input', { bubbles: true }));
+                            editor.focus();
+                        },
+                    }">
+                    <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <label for="goal-description" class="block text-sm">Описание</label>
+
+                        <div class="inline-flex rounded-xl border border-slate-600 bg-slate-900/50 p-1" role="tablist" aria-label="Формат редактора">
+                            @foreach(['raw' => 'RAW', 'markdown' => 'Markdown', 'html' => 'HTML'] as $format => $label)
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    x-on:click="descriptionFormat = '{{ $format }}'"
+                                    x-bind:aria-selected="descriptionFormat === '{{ $format }}'"
+                                    x-bind:class="descriptionFormat === '{{ $format }}'
+                                        ? 'bg-indigo-500/25 text-indigo-100 shadow-sm'
+                                        : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'"
+                                    class="rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                                    {{ $label }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div
+                        x-show="descriptionFormat !== 'raw'"
+                        style="display: none;"
+                        class="mb-2 flex flex-wrap gap-1 rounded-xl border border-slate-700 bg-slate-900/40 p-1.5"
+                        aria-label="Форматирование текста">
+                        @foreach([
+                            'heading' => ['H2', 'Заголовок'],
+                            'bold' => ['B', 'Жирный текст'],
+                            'italic' => ['I', 'Курсив'],
+                            'link' => ['Ссылка', 'Ссылка'],
+                            'bulletList' => ['• Список', 'Маркированный список'],
+                            'numberedList' => ['1. Список', 'Нумерованный список'],
+                            'quote' => ['❝', 'Цитата'],
+                            'code' => ['</>', 'Код'],
+                        ] as $command => [$label, $title])
+                            <button
+                                type="button"
+                                x-on:click="applyDescriptionFormat('{{ $command }}')"
+                                title="{{ $title }}"
+                                class="min-w-8 rounded-lg px-2 py-1 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition">
+                                {{ $label }}
+                            </button>
+                        @endforeach
+                    </div>
+
                     <textarea
-                        placeholder="Подробное описание цели..."
-                        rows="5"
+                        id="goal-description"
+                        x-ref="descriptionEditor"
+                        x-bind:placeholder="descriptionFormat === 'markdown'
+                            ? 'Описание в формате Markdown...'
+                            : (descriptionFormat === 'html' ? 'Описание в формате HTML...' : 'Подробное описание цели...')"
+                        x-bind:class="descriptionFormat === 'raw' ? '' : 'font-mono'"
+                        rows="7"
                         wire:model.defer="description"
                         class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-y"></textarea>
+
+                    <p class="mt-1.5 text-xs text-slate-500">
+                        <span x-show="descriptionFormat === 'raw'">Обычный текст без разметки.</span>
+                        <span x-show="descriptionFormat === 'markdown'" style="display: none;">Панель вставляет Markdown-разметку в выделенный текст.</span>
+                        <span x-show="descriptionFormat === 'html'" style="display: none;">Панель вставляет HTML-теги в выделенный текст.</span>
+                    </p>
                 </div>
 
                 <div>

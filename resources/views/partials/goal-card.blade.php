@@ -31,11 +31,11 @@ $dragEnabled = $dragEnabled ?? true;
     </div>
 
     <div class="text-xs text-slate-400 flex justify-between">
-        @if(!empty($goal->target_amount && !$goal->is_completed))<span>Цель: {{ number_format($goal->target_amount, 0, ',', ' ') }} ₽</span>@endif
-        @if(!empty($goal->saved_amount))<span>Достигнуто: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>@endif
+        @if((float) $goal->target_amount > 0 && ! $goal->is_completed)<span>Цель: {{ number_format($goal->target_amount, 0, ',', ' ') }} ₽</span>@endif
+        @if((float) $goal->saved_amount > 0)<span>Достигнуто: {{ number_format($goal->saved_amount, 0, ',', ' ') }} ₽</span>@endif
     </div>
 
-    @if(!empty($goal->target_amount))
+    @if((float) $goal->target_amount > 0)
     <div class="mt-1">
         <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
             <div

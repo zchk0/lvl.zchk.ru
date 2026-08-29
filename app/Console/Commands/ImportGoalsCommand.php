@@ -28,7 +28,7 @@ class ImportGoalsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Импортирует данные в модель Goal из JSON-файла';
+    protected $description = 'Импортирует доски и цели из JSON-файла';
 
     /**
      * Execute the console command.
@@ -54,7 +54,17 @@ class ImportGoalsCommand extends Command
 
         $data = json_decode($contents, true);
         if (! is_array($data)) {
-            $this->error('Неверный формат JSON: ожидается массив объектов.');
+            $this->error('Неверный формат JSON.');
+
+            return self::FAILURE;
+        }
+
+        $version = $data['version'] ?? null;
+        $boards = $data['boards'] ?? null;
+        $goals = $data['goals'] ?? null;
+
+        if ($version !== 2 || ! is_array($boards) || ! array_is_list($boards) || ! is_array($goals) || ! array_is_list($goals)) {
+            $this->error('Неверный формат экспорта: ожидается версия 2 с массивами boards и goals.');
 
             return self::FAILURE;
         }
@@ -62,29 +72,25 @@ class ImportGoalsCommand extends Command
         $truncate = (bool) $this->option('truncate');
 
         try {
-            DB::transaction(function () use ($data, $truncate) {
+            DB::transaction(function () use ($boards, $goals, $truncate) {
                 if ($truncate) {
-                    $this->warn('Очищаю таблицу goals (TRUNCATE)...');
-                    Goal::truncate();
+                    $this->warn('Очищаю таблицу goals...');
+                    Goal::query()->delete();
                 }
 
-                $boardId = Board::query()->value('id');
-                if (! $boardId) {
-                    $boardId = Board::create([
-                        'name' => env('DEFAULT_BOARD_NAME', 'Основная доска'),
-                        'pin_code' => env('PIN_CODE', '1011'),
-                    ])->id;
-                }
-
+                $boardMap = $this->importBoards($boards);
                 $count = 0;
 
-                foreach ($data as $item) {
+                foreach ($goals as $item) {
                     if (! is_array($item)) {
-                        continue;
+                        throw new \UnexpectedValueException('Некорректная запись цели в файле экспорта.');
                     }
 
+                    $sourceBoardId = isset($item['board_id']) ? (int) $item['board_id'] : null;
+                    $goalBoardId = $this->resolveBoardId($sourceBoardId, $boardMap);
+
                     $payload = [
-                        'board_id' => isset($item['board_id']) ? (int) $item['board_id'] : $boardId,
+                        'board_id' => $goalBoardId,
                         'title' => $item['title'] ?? 'Без названия',
                         'url' => $item['url'] ?? null,
                         'description' => $item['description'] ?? '',
@@ -116,5 +122,49 @@ class ImportGoalsCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @param  array<int, mixed>  $boards
+     * @return array<int, int>
+     */
+    private function importBoards(array $boards): array
+    {
+        $boardMap = [];
+
+        foreach ($boards as $item) {
+            if (! is_array($item)) {
+                throw new \UnexpectedValueException('Некорректная запись доски в файле экспорта.');
+            }
+
+            $sourceId = isset($item['id']) ? (int) $item['id'] : 0;
+            $name = isset($item['name']) ? trim((string) $item['name']) : '';
+            $pinCode = isset($item['pin_code']) ? (string) $item['pin_code'] : '';
+
+            if ($sourceId <= 0 || $name === '' || ! preg_match('/^\d{4}$/', $pinCode)) {
+                throw new \UnexpectedValueException("Некорректные данные доски с исходным ID {$sourceId}.");
+            }
+
+            $board = Board::query()->firstOrCreate(
+                ['pin_code' => $pinCode],
+                ['name' => $name],
+            );
+
+            $boardMap[$sourceId] = $board->id;
+        }
+
+        return $boardMap;
+    }
+
+    /**
+     * @param  array<int, int>  $boardMap
+     */
+    private function resolveBoardId(?int $sourceBoardId, array $boardMap): int
+    {
+        if ($sourceBoardId && isset($boardMap[$sourceBoardId])) {
+            return $boardMap[$sourceBoardId];
+        }
+
+        throw new \UnexpectedValueException("Для цели не найдена доска с исходным ID {$sourceBoardId}.");
     }
 }

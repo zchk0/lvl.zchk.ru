@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Board;
 use App\Models\Goal;
 use Illuminate\Console\Command;
 
@@ -24,7 +25,7 @@ class ExportGoalsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Экспортирует все записи модели Goal в JSON-файл';
+    protected $description = 'Экспортирует доски и цели в JSON-файл';
 
     /**
      * Выполнение команды.
@@ -37,34 +38,47 @@ class ExportGoalsCommand extends Command
         // Если передан относительный путь — считаем его от корня проекта
         $path = $pathArg ? base_path($pathArg) : $defaultPath;
 
-        $this->info('Экспорт целей...');
+        $this->info('Экспорт досок и целей...');
+        $boards = Board::query()
+            ->orderBy('id')
+            ->get();
+
         $goals = Goal::orderBy('priority')
             ->orderBy('position')
             ->orderBy('id')
             ->get();
 
-        // Явно выбираем поля, чтобы не тащить всякий мусор
-        $data = $goals->map(function (Goal $goal) {
-            return [
-                'board_id' => (int) $goal->board_id,
-                'title' => $goal->title,
-                'url' => $goal->url,
-                'description' => $goal->description ?? '',
-                'description_format' => in_array($goal->description_format, Goal::DESCRIPTION_FORMATS, true)
-                    ? $goal->description_format
-                    : 'raw',
-                'subgoals' => is_array($goal->subgoals) ? $goal->subgoals : [],
-                'author_name' => $goal->author_name,
-                'target_amount' => (float) $goal->target_amount,
-                'saved_amount' => (float) $goal->saved_amount,
-                'priority' => (int) $goal->priority,
-                'is_completed' => (bool) $goal->is_completed,
-                'is_public' => (bool) $goal->is_public,
-                'public_token' => $goal->public_token,
-                'position' => (int) $goal->position,
-                'created_at' => $goal->created_at,
-            ];
-        })->all();
+        $data = [
+            'version' => 2,
+            'boards' => $boards->map(function (Board $board) {
+                return [
+                    'id' => (int) $board->id,
+                    'name' => $board->name,
+                    'pin_code' => $board->pin_code,
+                ];
+            })->all(),
+            'goals' => $goals->map(function (Goal $goal) {
+                return [
+                    'board_id' => (int) $goal->board_id,
+                    'title' => $goal->title,
+                    'url' => $goal->url,
+                    'description' => $goal->description ?? '',
+                    'description_format' => in_array($goal->description_format, Goal::DESCRIPTION_FORMATS, true)
+                        ? $goal->description_format
+                        : 'raw',
+                    'subgoals' => is_array($goal->subgoals) ? $goal->subgoals : [],
+                    'author_name' => $goal->author_name,
+                    'target_amount' => (float) $goal->target_amount,
+                    'saved_amount' => (float) $goal->saved_amount,
+                    'priority' => (int) $goal->priority,
+                    'is_completed' => (bool) $goal->is_completed,
+                    'is_public' => (bool) $goal->is_public,
+                    'public_token' => $goal->public_token,
+                    'position' => (int) $goal->position,
+                    'created_at' => $goal->created_at,
+                ];
+            })->all(),
+        ];
 
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
@@ -89,7 +103,7 @@ class ExportGoalsCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info('Экспортировано '.count($data).' целей.');
+        $this->info("Экспортировано досок: {$boards->count()}, целей: {$goals->count()}.");
         $this->info("Файл: {$path}");
 
         return self::SUCCESS;

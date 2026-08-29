@@ -18,7 +18,7 @@ LVLzchk — веб-приложение для ведения личных и с
 ## Технологии
 
 - PHP 8.5+ и Laravel 12;
-- Livewire 3;
+- Livewire 4;
 - Tailwind CSS 4 и Vite 7;
 - SQLite;
 - Docker Compose и Nginx.

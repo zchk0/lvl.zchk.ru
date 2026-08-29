@@ -15,6 +15,7 @@ class GoalsImportExportTest extends TestCase
     {
         $path = 'storage/app/goals_export_v2_test.json';
         $absolutePath = base_path($path);
+        $longUrl = 'https://example.com/'.str_repeat('long-segment/', 30);
         $secondaryBoard = Board::create([
             'name' => 'Secondary board',
             'pin_code' => '9876',
@@ -23,6 +24,7 @@ class GoalsImportExportTest extends TestCase
         Goal::create([
             'board_id' => $secondaryBoard->id,
             'title' => 'Mapped goal',
+            'url' => $longUrl,
             'priority' => 2,
             'position' => 1,
         ]);
@@ -50,5 +52,6 @@ class GoalsImportExportTest extends TestCase
 
         $this->assertSame('9876', $importedGoal->board->pin_code);
         $this->assertSame('Secondary board', $importedGoal->board->name);
+        $this->assertSame($longUrl, $importedGoal->url);
     }
 }

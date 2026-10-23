@@ -17,7 +17,7 @@ $dragEnabled = $dragEnabled ?? true;
             @if($goal->author_tags)
             <div class="mt-1 flex flex-wrap gap-x-2.5 gap-y-1">
                 @foreach($goal->author_tags as $tag)
-                    <span class="inline-flex max-w-full items-baseline gap-0.5 text-[11px] leading-4 text-slate-400">
+                    <span class="inline-flex max-w-full items-baseline gap-0.5 italic text-[12px] leading-4 text-slate-400">
                         <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
                         <span class="min-w-0 break-all">{{ $tag }}</span>
                     </span>

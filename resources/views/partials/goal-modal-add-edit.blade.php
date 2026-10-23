@@ -317,17 +317,17 @@
                     <label for="goal-author-tag" class="block text-sm mb-1">Автор</label>
                     <div
                         x-on:click="$refs.authorInput.focus()"
-                        class="flex min-h-[42px] flex-wrap items-center gap-2 rounded-2xl border bg-slate-900 px-3 py-2 focus-within:ring-1
+                        class="flex min-h-[38px] flex-wrap items-center gap-2 rounded-2xl border bg-slate-900 px-3 py-2 focus-within:ring-1
                             @error('author_name') border-red-500 focus-within:ring-red-500 @else border-slate-600 focus-within:border-indigo-500 focus-within:ring-indigo-500 @enderror">
                         <template x-for="(tag, index) in tags" :key="tag">
-                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-slate-700/60 bg-slate-800/70 pl-2 pr-1 py-0.5 text-xs font-medium text-slate-300">
+                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-slate-700/60 bg-slate-800/70 pl-2 pr-1 text-xs font-medium leading-4 text-slate-300">
                                 <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
                                 <span class="min-w-0 break-all" x-text="tag"></span>
                                 <button
                                     type="button"
                                     x-on:click.stop="remove(index); $refs.authorInput.focus()"
                                     :aria-label="'Удалить тег ' + tag"
-                                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded text-slate-400 hover:bg-slate-700 hover:text-white">&times;</button>
+                                    class="flex h-4 w-4 shrink-0 items-center justify-center rounded text-slate-400 hover:bg-slate-700 hover:text-white">&times;</button>
                             </span>
                         </template>
                         <input
@@ -347,7 +347,7 @@
                             :aria-activedescendant="open && activeIndex >= 0 ? 'goal-author-option-' + activeIndex : null"
                             :placeholder="tags.length ? 'Ещё автор…' : 'Введите или выберите автора…'"
                             autocomplete="off"
-                            class="min-w-[140px] flex-1 bg-transparent py-0.5 text-sm outline-none placeholder:text-slate-500">
+                            class="min-w-[140px] flex-1 bg-transparent py-0 text-sm leading-5 outline-none placeholder:text-slate-500">
                     </div>
                     <div
                         id="goal-author-suggestions"

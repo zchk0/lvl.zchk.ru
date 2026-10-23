@@ -175,7 +175,7 @@ class GoalsBoard extends Component
             'priority' => ['required', 'integer', 'in:1,2,3,4'],
             'is_completed' => ['boolean'],
         ], [
-            'author_name.max' => 'Общая длина тегов автора не должна превышать 255 символов.',
+            'author_name.max' => 'Общая длина тегов не должна превышать 255 символов.',
         ]);
 
         $data = [

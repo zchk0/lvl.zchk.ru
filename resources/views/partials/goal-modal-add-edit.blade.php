@@ -314,7 +314,7 @@
                     x-on:click.outside="open = false"
                     x-on:focusout="if (!$el.contains($event.relatedTarget)) open = false"
                     wire:key="author-tags-{{ $editingId ?? 'new' }}">
-                    <label for="goal-author-tag" class="block text-sm mb-1">Автор</label>
+                    <label for="goal-author-tag" class="block text-sm mb-1">Теги</label>
                     <div
                         x-on:click="$refs.authorInput.focus()"
                         class="flex min-h-[38px] flex-wrap items-center gap-2 rounded-2xl border bg-slate-900 px-3 py-1 focus-within:ring-1
@@ -345,7 +345,7 @@
                             aria-describedby="goal-author-help"
                             :aria-expanded="open && suggestions.length > 0"
                             :aria-activedescendant="open && activeIndex >= 0 ? 'goal-author-option-' + activeIndex : null"
-                            :placeholder="tags.length ? 'Ещё автор…' : 'Введите или выберите автора…'"
+                            :placeholder="tags.length ? 'Ещё тег…' : 'Введите или выберите тег…'"
                             autocomplete="off"
                             class="min-w-[140px] flex-1 bg-transparent py-0 text-sm leading-5 outline-none placeholder:text-slate-500">
                     </div>
@@ -355,7 +355,7 @@
                         x-show="open && suggestions.length > 0"
                         style="display: none;"
                         role="listbox"
-                        aria-label="Ранее введённые авторы"
+                        aria-label="Ранее введённые теги"
                         class="mt-2 max-h-40 overflow-y-auto rounded-xl border-none bg-slate-900 p-1 shadow-lg">
                         <template x-for="(tag, index) in suggestions" :key="tag">
                             <button

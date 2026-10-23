@@ -511,7 +511,7 @@
             <h1>{{ $goal->title }}</h1>
             @if($goal->author_tags)
                 <div class="author">
-                    <span>Автор:</span>
+                    <span>Теги:</span>
                     @foreach($goal->author_tags as $tag)
                         <span class="chip" style="overflow-wrap: anywhere;">{{ $tag }}</span>
                     @endforeach

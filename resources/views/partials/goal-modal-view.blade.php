@@ -35,7 +35,7 @@
                             @if($viewingGoal->author_tags)
                                 <div class="flex max-w-full flex-wrap gap-1.5" role="group" aria-label="Авторы">
                                     @foreach($viewingGoal->author_tags as $tag)
-                                        <span class="inline-flex max-w-full items-baseline gap-1 rounded-lg border-none bg-slate-700/40 px-2.5 py-1 text-xs font-medium leading-4 text-slate-200">
+                                        <span class="inline-flex max-w-full items-baseline gap-1 rounded-lg border-dashed border-slate-500/25 bg-slate-700/40 px-2.5 py-1 text-xs font-medium leading-4 text-slate-200">
                                             <span aria-hidden="true" class="shrink-0 text-slate-400">#</span>
                                             <span class="min-w-0 break-all">{{ $tag }}</span>
                                         </span>

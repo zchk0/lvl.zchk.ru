@@ -356,7 +356,7 @@
                         style="display: none;"
                         role="listbox"
                         aria-label="Ранее введённые авторы"
-                        class="mt-2 max-h-40 overflow-y-auto rounded-xl border border-slate-600 bg-slate-900 p-1 shadow-lg">
+                        class="mt-2 max-h-40 overflow-y-auto rounded-xl border-none bg-slate-900 p-1 shadow-lg">
                         <template x-for="(tag, index) in suggestions" :key="tag">
                             <button
                                 type="button"

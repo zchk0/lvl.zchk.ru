@@ -10,6 +10,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/docs/api', 'api-docs')->name('api.docs');
+
 Route::get('/share/{token}', function (string $token) {
     $goal = Goal::query()
         ->where('public_token', $token)

@@ -58,8 +58,20 @@
             </div>
 
             <div class="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
-                <label for="board-api-key" class="block text-sm font-medium text-slate-200">API-ключ</label>
-                <p id="board-api-key-help" class="mt-1 text-xs leading-5 text-slate-400">Создание цели: <code>POST /api/goals</code>. Передавайте ключ в заголовке <code>Authorization: Bearer …</code>.</p>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <label for="board-api-key" class="block text-sm font-medium text-slate-200">API-ключ</label>
+                    <a
+                        href="{{ route('api.docs') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1 text-xs text-indigo-300 transition hover:text-indigo-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60 rounded">
+                        Документация API
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0-7L10 14M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5" />
+                        </svg>
+                        <span class="sr-only">(в новой вкладке)</span>
+                    </a>
+                </div>
 
                 <div class="mt-3 flex flex-col gap-2 sm:flex-row">
                     <input
@@ -69,7 +81,6 @@
                         readonly
                         spellcheck="false"
                         autocomplete="off"
-                        aria-describedby="board-api-key-help"
                         value="{{ $currentBoard->api_key }}"
                         x-on:click="$el.select()"
                         class="min-w-0 w-full flex-1 rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 font-mono text-xs leading-5 text-slate-200 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400">

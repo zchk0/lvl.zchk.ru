@@ -23,6 +23,7 @@ class PinCodeMiddleware
             'admin',
             'admin/*',
             'share/*',
+            'docs/api',
         ];
 
         // Не проверяем PIN для этих путей, иначе будет бесконечный редирект

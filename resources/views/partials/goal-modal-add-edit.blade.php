@@ -368,7 +368,7 @@
                                 x-on:click="add(tag); $refs.authorInput.focus()"
                                 :class="activeIndex === index ? 'bg-slate-800 text-slate-100' : 'text-slate-300 hover:bg-slate-800'"
                                 class="block w-full rounded-lg px-3 py-2 text-left text-sm break-words">
-                                <span class="inline-flex max-w-full items-center gap-1 rounded-md bg-slate-800/70 px-2 py-0.5 text-[11px] font-medium leading-4 text-slate-300 ring-1 ring-inset ring-slate-700/60">
+                                <span class="inline-flex max-w-full items-center gap-1 rounded-md border-none bg-slate-800/70 px-2 py-0.5 text-[11px] font-medium leading-4 text-slate-300">
                                     <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
                                     <span class="min-w-0 break-all" x-text="tag"></span>
                                 </span>

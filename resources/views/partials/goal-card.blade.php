@@ -15,12 +15,16 @@ $dragEnabled = $dragEnabled ?? true;
                 {{ $goal->title }}
             </button>
             @if($goal->author_tags)
-            <div class="mt-1 flex flex-wrap gap-x-2.5 gap-y-1">
+            <div class="mt-1 flex flex-wrap gap-x-2 gap-y-1">
                 @foreach($goal->author_tags as $tag)
-                    <span class="inline-flex max-w-full items-baseline gap-0.5 italic text-[12px] leading-4 text-slate-400">
+                    <button
+                        type="button"
+                        wire:click="$set('search', @js($tag))"
+                        title="Найти цели с тегом {{ $tag }}"
+                        class="inline-flex max-w-full items-baseline gap-px italic text-[12px] leading-4 text-slate-400 text-left hover:text-indigo-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/60 rounded-sm transition cursor-pointer">
                         <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
                         <span class="min-w-0 break-all">{{ $tag }}</span>
-                    </span>
+                    </button>
                 @endforeach
             </div>
             @endif

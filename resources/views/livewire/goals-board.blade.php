@@ -22,9 +22,22 @@
         {{-- Заголовок + селект фильтра --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-semibold">
-                    Цели v0.60
-                </h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl sm:text-3xl font-semibold">
+                        Цели v0.61
+                    </h1>
+                    <button
+                        type="button"
+                        wire:click="openBoardSettings"
+                        aria-label="Настройки текущей доски"
+                        title="Настройки доски"
+                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linejoin="round" d="M9.13 5.07 10.26 2.15h3.48l1.13 2.92 2.87-1.26 2.45 2.45-1.26 2.87 2.92 1.13v3.48l-2.92 1.13 1.26 2.87-2.45 2.45-2.87-1.26-1.13 2.92h-3.48l-1.13-2.92-2.87 1.26-2.45-2.45 1.26-2.87-2.92-1.13v-3.48l2.92-1.13-1.26-2.87 2.45-2.45Z" />
+                            <circle cx="12" cy="12" r="3.25" />
+                        </svg>
+                    </button>
+                </div>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
                     <span>{{ $currentBoard->name }}</span>
                     <form method="POST" action="{{ route('pin.logout') }}">
@@ -297,6 +310,11 @@
             @endif
         </div>
     </div>
+
+    {{-- НАСТРОЙКИ ТЕКУЩЕЙ ДОСКИ --}}
+    @if($showBoardSettingsModal)
+        @include('partials.board-modal-settings')
+    @endif
 
     {{-- МОДАЛКА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ --}}
     @if($showModal)

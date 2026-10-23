@@ -13,6 +13,7 @@ class GoalsBoard extends Component
 {
     public bool $showModal = false;
     public bool $showViewModal = false;
+    public bool $showBoardSettingsModal = false;
     public ?Goal $viewingGoal = null;
     public ?int $confirmSubgoalCostsGoalId = null;
     public float $pendingSubgoalCostsTotal = 0.0;
@@ -97,6 +98,22 @@ class GoalsBoard extends Component
                     ->values()->all()
                 : [],
         ]);
+    }
+
+    public function openBoardSettings(): void
+    {
+        $this->showBoardSettingsModal = true;
+    }
+
+    public function closeBoardSettings(): void
+    {
+        $this->showBoardSettingsModal = false;
+    }
+
+    public function resetBoardApiKey(): void
+    {
+        Board::findOrFail($this->currentBoardId())->resetApiKey();
+        $this->dispatch('board-api-key-reset');
     }
 
     public function openCreate(int $priority): void

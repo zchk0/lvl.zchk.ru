@@ -15,9 +15,9 @@ $dragEnabled = $dragEnabled ?? true;
                 {{ $goal->title }}
             </button>
             @if($goal->author_tags)
-            <div class="mt-1.5 flex flex-wrap gap-1.5">
+            <div class="mt-1 flex flex-wrap gap-x-2.5 gap-y-1">
                 @foreach($goal->author_tags as $tag)
-                    <span class="inline-flex max-w-full items-center gap-1 rounded-md bg-slate-800/70 px-2 py-0.5 text-[11px] font-medium leading-4 text-slate-300 ring-1 ring-inset ring-slate-700/60">
+                    <span class="inline-flex max-w-full items-baseline gap-0.5 text-[11px] leading-4 text-slate-400">
                         <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
                         <span class="min-w-0 break-all">{{ $tag }}</span>
                     </span>

@@ -59,7 +59,7 @@
 
             <div class="rounded-2xl border border-slate-700 bg-slate-900/40 p-4">
                 <label for="board-api-key" class="block text-sm font-medium text-slate-200">API-ключ</label>
-                <p id="board-api-key-help" class="mt-1 text-xs leading-5 text-slate-400">Ключ доступа к текущей доске. API пока недоступен.</p>
+                <p id="board-api-key-help" class="mt-1 text-xs leading-5 text-slate-400">Создание цели: <code>POST /api/goals</code>. Передавайте ключ в заголовке <code>Authorization: Bearer …</code>.</p>
 
                 <div class="mt-3 flex flex-col gap-2 sm:flex-row">
                     <input

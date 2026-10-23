@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Actions\CreateGoal;
 use App\Models\Board;
 use App\Models\Goal;
 use Illuminate\Support\Facades\DB;
@@ -194,19 +195,7 @@ class GoalsBoard extends Component
             $goal = $this->findGoalForCurrentBoard($this->editingId);
             $goal->update($data);
         } else {
-            $boardId = $this->currentBoardId();
-
-            DB::transaction(function () use ($data, $boardId) {
-                // Сдвигаем все позиции вниз внутри priority
-                // Новая карточка становится первой
-                Goal::where('board_id', $boardId)
-                    ->where('priority', $data['priority'])
-                    ->increment('position');
-                $data['position'] = 1;
-                $data['board_id'] = $boardId;
-
-                Goal::create($data);
-            });
+            app(CreateGoal::class)->handle($this->currentBoardId(), $data);
         }
 
         $this->closeModal();

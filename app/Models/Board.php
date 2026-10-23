@@ -13,26 +13,28 @@ class Board extends Model
         'pin_code',
     ];
 
-    protected $hidden = ['api_key'];
+    protected $hidden = ['api_key', 'api_key_hash'];
 
     protected $casts = ['api_key' => 'encrypted'];
 
     protected static function booted(): void
     {
         static::creating(function (self $board): void {
-            $board->api_key = self::generateApiKey();
+            $board->generateApiKey();
         });
     }
 
     public function resetApiKey(): void
     {
-        $this->api_key = self::generateApiKey();
+        $this->generateApiKey();
         $this->save();
     }
 
-    private static function generateApiKey(): string
+    private function generateApiKey(): void
     {
-        return 'lvl_'.Str::random(64);
+        $key = 'lvl_'.Str::random(64);
+        $this->api_key = $key;
+        $this->api_key_hash = hash('sha256', $key);
     }
 
     public function goals(): HasMany

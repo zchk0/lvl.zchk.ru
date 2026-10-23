@@ -13,6 +13,7 @@ LVLzchk — веб-приложение для ведения личных и с
 - отслеживание целевой и накопленной суммы с отображением прогресса;
 - описания в обычном тексте, Markdown или HTML;
 - публикация отдельных целей по уникальной общедоступной ссылке;
+- создание целей через API с ключом доски;
 - импорт и экспорт целей в JSON.
 
 ## Технологии
@@ -41,6 +42,24 @@ composer run dev
 ```
 
 Перед первым запуском при необходимости измените в `.env` значения `PIN_CODE`, `ADMIN_PIN_CODE` и `DEFAULT_BOARD_NAME`.
+
+## API: Создание цели
+
+`POST /api/goals` создаёт цель в доске, которой принадлежит API-ключ. 
+
+```bash
+curl -X POST 'https://example.com/api/goals' \
+  -H 'Authorization: Bearer API_KEY' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  --data '{
+    "title": "Купить монитор",
+    "description": "Подобрать монитор для работы",
+    "priority": 2,
+    "target_amount": 30000,
+    "tags": ["IVAN", "Работа"]
+  }'
+```
 
 ## Импорт и экспорт
 

@@ -320,13 +320,14 @@
                         class="flex min-h-[42px] flex-wrap items-center gap-2 rounded-2xl border bg-slate-900 px-3 py-2 focus-within:ring-1
                             @error('author_name') border-red-500 focus-within:ring-red-500 @else border-slate-600 focus-within:border-indigo-500 focus-within:ring-indigo-500 @enderror">
                         <template x-for="(tag, index) in tags" :key="tag">
-                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-full border border-indigo-400/30 bg-indigo-500/15 pl-2.5 pr-1 py-0.5 text-xs text-indigo-200">
-                                <span class="break-all" x-text="tag"></span>
+                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-slate-700/60 bg-slate-800/70 pl-2 pr-1 py-0.5 text-xs font-medium text-slate-300">
+                                <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
+                                <span class="min-w-0 break-all" x-text="tag"></span>
                                 <button
                                     type="button"
                                     x-on:click.stop="remove(index); $refs.authorInput.focus()"
                                     :aria-label="'Удалить тег ' + tag"
-                                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-indigo-300 hover:bg-indigo-400/20 hover:text-white">&times;</button>
+                                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded text-slate-400 hover:bg-slate-700 hover:text-white">&times;</button>
                             </span>
                         </template>
                         <input
@@ -365,9 +366,12 @@
                                 :aria-selected="activeIndex === index"
                                 x-on:mousedown.prevent
                                 x-on:click="add(tag); $refs.authorInput.focus()"
-                                :class="activeIndex === index ? 'bg-indigo-500/20 text-indigo-100' : 'text-slate-300 hover:bg-slate-800'"
+                                :class="activeIndex === index ? 'bg-slate-800 text-slate-100' : 'text-slate-300 hover:bg-slate-800'"
                                 class="block w-full rounded-lg px-3 py-2 text-left text-sm break-words">
-                                <span class="inline-block rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-xs text-indigo-200" x-text="tag"></span>
+                                <span class="inline-flex max-w-full items-center gap-1 rounded-md bg-slate-800/70 px-2 py-0.5 text-[11px] font-medium leading-4 text-slate-300 ring-1 ring-inset ring-slate-700/60">
+                                    <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
+                                    <span class="min-w-0 break-all" x-text="tag"></span>
+                                </span>
                             </button>
                         </template>
                     </div>

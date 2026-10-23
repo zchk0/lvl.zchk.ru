@@ -8,16 +8,19 @@ $dragEnabled = $dragEnabled ?? true;
     data-goal-id="{{ $goal->id }}"
     draggable="{{ $dragEnabled ? 'true' : 'false' }}">
     <div class="flex items-start justify-between gap-2">
-        <div>
+        <div class="min-w-0">
             <button
                 wire:click="openView({{ $goal->id }})"
                 class="font-semibold text-slate-100 text-base leading-[1.4rem] {{ $goal->is_completed ? 'line-through text-slate-400' : '' }} text-left hover:text-indigo-300 transition cursor-pointer">
                 {{ $goal->title }}
             </button>
             @if($goal->author_tags)
-            <div class="mt-1 flex flex-wrap gap-1.5">
+            <div class="mt-1.5 flex flex-wrap gap-1.5">
                 @foreach($goal->author_tags as $tag)
-                    <span class="max-w-full break-all rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2 py-0.5 text-xs text-indigo-200">{{ $tag }}</span>
+                    <span class="inline-flex max-w-full items-center gap-1 rounded-md bg-slate-800/70 px-2 py-0.5 text-[11px] font-medium leading-4 text-slate-300 ring-1 ring-inset ring-slate-700/60">
+                        <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
+                        <span class="min-w-0 break-all">{{ $tag }}</span>
+                    </span>
                 @endforeach
             </div>
             @endif

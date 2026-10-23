@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\CreateGoal;
+use App\Actions\ListGoals;
 use App\Actions\UpdateGoal;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexGoalRequest;
 use App\Http\Requests\StoreGoalRequest;
 use App\Http\Requests\UpdateGoalRequest;
 use App\Http\Resources\GoalResource;
@@ -13,6 +15,16 @@ use Illuminate\Http\JsonResponse;
 
 class GoalController extends Controller
 {
+    public function index(IndexGoalRequest $request, ListGoals $listGoals): JsonResponse
+    {
+        $goals = $listGoals->handle(
+            $request->attributes->get('api_board')->id,
+            $request->validated()
+        );
+
+        return GoalResource::collection($goals)->response();
+    }
+
     public function store(StoreGoalRequest $request, CreateGoal $createGoal): JsonResponse
     {
         $data = $request->validated();
@@ -29,13 +41,14 @@ class GoalController extends Controller
             'is_completed' => $data['is_completed'] ?? false,
         ]);
 
-        return (new GoalResource($goal))->response()->setStatusCode(201);
+        return (new GoalResource($goal))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function update(UpdateGoalRequest $request, string $goal, UpdateGoal $updateGoal): JsonResponse
     {
         $data = $request->validated();
-
         if (array_key_exists('tags', $data)) {
             $tags = Goal::parseAuthorTags(implode(', ', $data['tags']));
             $data['author_name'] = $tags ? implode(', ', $tags) : null;
@@ -48,7 +61,11 @@ class GoalController extends Controller
             }
         }
 
-        $updated = $updateGoal->handle($request->attributes->get('api_board')->id, $goal, $data);
+        $updated = $updateGoal->handle(
+            $request->attributes->get('api_board')->id,
+            $goal,
+            $data
+        );
 
         return (new GoalResource($updated))->response();
     }

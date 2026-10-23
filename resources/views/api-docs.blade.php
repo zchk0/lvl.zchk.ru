@@ -4,6 +4,7 @@
     $sections = [
         'quickstart' => 'Быстрый старт',
         'authentication' => 'Авторизация',
+        'list-goals' => 'Получение целей',
         'create-goal' => 'Создание цели',
         'update-goal' => 'Изменение цели',
         'parameters' => 'Параметры',
@@ -84,7 +85,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Документация API целей: авторизация ключом доски, создание и изменение целей, параметры и примеры запросов.">
+    <meta name="description" content="Документация API целей: получение с фильтрами и пагинацией, создание и изменение целей. Авторизация, параметры и примеры запросов.">
     <title>Документация API | Цели</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -124,6 +125,10 @@
             </nav>
             <div class="mt-7 space-y-3 border-t border-slate-800 pt-5">
                 <div>
+                    <span class="rounded bg-violet-500/10 px-1.5 py-1 font-mono text-[10px] font-semibold text-violet-300">GET</span>
+                    <a href="#list-goals" class="ml-1.5 font-mono text-xs text-slate-400 hover:text-slate-100">/api/goals</a>
+                </div>
+                <div>
                     <span class="rounded bg-emerald-500/10 px-1.5 py-1 font-mono text-[10px] font-semibold text-emerald-300">POST</span>
                     <a href="#create-goal" class="ml-1.5 font-mono text-xs text-slate-400 hover:text-slate-100">/api/goals</a>
                 </div>
@@ -136,10 +141,15 @@
 
         <main id="main-content" class="min-w-0 flex-1">
             <div class="mb-10">
-                <span class="inline-flex items-center gap-2 text-xs font-medium text-indigo-300"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span> API · 2 метода</span>
+                <span class="inline-flex items-center gap-2 text-xs font-medium text-indigo-300"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span> API · 3 метода</span>
                 <h1 class="mt-4 text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">Документация API</h1>
-                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">Создавайте и изменяйте цели в своей доске из скриптов и интеграций. Для первого запроса достаточно ключа доски и названия цели.</p>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">Получайте, создавайте и изменяйте цели в своей доске из скриптов и интеграций. Для доступа нужен API-ключ доски.</p>
                 <div class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-800/60 px-4 py-3">
+                    <span class="rounded-md bg-violet-500/10 px-2 py-1 font-mono text-xs font-semibold text-violet-300">GET</span>
+                    <code class="text-sm text-slate-200">/api/goals</code>
+                    <span class="text-xs text-slate-500 sm:ml-auto">JSON · Bearer token</span>
+                </div>
+                <div class="mt-2 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-800/60 px-4 py-3">
                     <span class="rounded-md bg-emerald-500/10 px-2 py-1 font-mono text-xs font-semibold text-emerald-300">POST</span>
                     <code class="text-sm text-slate-200">/api/goals</code>
                     <span class="text-xs text-slate-500 sm:ml-auto">JSON · Bearer token</span>
@@ -187,6 +197,8 @@
                     </div>
                     <p class="mt-4 text-sm leading-7 text-slate-400">PIN-код, cookies и CSRF-токен для API не нужны. Ключи в URL и теле запроса не принимаются. При сбросе ключа в настройках прежний ключ сразу перестаёт работать.</p>
                 </section>
+
+                @include('partials.api-docs-list', ['goalExample' => $success['data'], 'jsonFlags' => $flags])
 
                 <section id="create-goal" class="scroll-mt-24">
                     <div class="flex flex-wrap items-center gap-3">

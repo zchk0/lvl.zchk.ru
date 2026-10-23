@@ -22,6 +22,8 @@ class ApiDocumentationTest extends TestCase
             ->assertSee('/api/goals')
             ->assertSee('Изменение цели')
             ->assertSee('PATCH')
+            ->assertSee('Получение целей')
+            ->assertSee('GET')
             ->assertSee('API_KEY')
             ->assertDontSee($board->api_key)
             ->assertDontSee($board->api_key_hash);
@@ -31,7 +33,7 @@ class ApiDocumentationTest extends TestCase
     {
         $html = $this->get(route('api.docs'))->assertOk()->getContent();
         $document = new DOMDocument;
-        $document->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $document->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
         $code = (new DOMXPath($document))->query('//*[@id="request-body-example"]//code')->item(0);
         $this->assertNotNull($code);
         $payload = json_decode($code->textContent, true, flags: JSON_THROW_ON_ERROR);
@@ -49,7 +51,7 @@ class ApiDocumentationTest extends TestCase
     {
         $html = $this->get(route('api.docs'))->assertOk()->getContent();
         $document = new DOMDocument;
-        $document->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $document->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
         $xpath = new DOMXPath($document);
         $createCode = $xpath->query('//*[@id="request-body-example"]//code')->item(0);
         $updateCode = $xpath->query('//*[@id="update-request-body-example"]//code')->item(0);
@@ -60,7 +62,7 @@ class ApiDocumentationTest extends TestCase
         $board = Board::query()->firstOrFail();
         $id = $this->withToken($board->api_key)->postJson('/api/goals', $createPayload)->assertCreated()->json('data.id');
 
-        $this->patchJson('/api/goals/'.$id, $updatePayload)
+        $this->patchJson('/api/goals/' . $id, $updatePayload)
             ->assertOk()
             ->assertJsonPath('data.id', $id)
             ->assertJsonPath('data.title', $updatePayload['title'])
@@ -69,5 +71,28 @@ class ApiDocumentationTest extends TestCase
             ->assertJsonPath('data.description', $createPayload['description'])
             ->assertJsonPath('data.target_amount', $createPayload['target_amount'])
             ->assertJsonPath('data.priority', $createPayload['priority']);
+    }
+
+    public function test_the_documented_list_url_filters_the_created_goal(): void
+    {
+        $html = $this->get(route('api.docs'))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $document->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $xpath = new DOMXPath($document);
+        $createCode = $xpath->query('//*[@id="request-body-example"]//code')->item(0);
+        $listCode = $xpath->query('//*[@id="list-javascript-panel"]//code')->item(0);
+        $this->assertNotNull($createCode);
+        $this->assertNotNull($listCode);
+        $payload = json_decode($createCode->textContent, true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(1, preg_match('/fetch\("([^"]+)"/', $listCode->textContent, $matches));
+        $board = Board::query()->firstOrFail();
+        $id = $this->withToken($board->api_key)->postJson('/api/goals', $payload)->assertCreated()->json('data.id');
+        $this->postJson('/api/goals', [...$payload, 'is_completed' => true])->assertCreated();
+        $this->postJson('/api/goals', [...$payload, 'tags' => ['Other']])->assertCreated();
+
+        $this->getJson($matches[1])->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $id)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('meta.per_page', 20);
     }
 }

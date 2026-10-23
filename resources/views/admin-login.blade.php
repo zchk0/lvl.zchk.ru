@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Администратор</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ asset('js/pin-cooldown.js') }}" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body class="min-h-screen flex items-center justify-center bg-slate-900 text-slate-100">
@@ -18,16 +19,22 @@
                 name="pin"
                 inputmode="numeric"
                 autocomplete="current-password"
-                class="w-full rounded-2xl border border-slate-600 bg-slate-900/60 px-4 py-3 text-center text-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                class="w-full rounded-2xl border border-slate-600 bg-slate-900/60 px-4 py-3 text-center text-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                @disabled($retryAfter > 0)
                 autofocus>
 
-            @error('pin')
-                <div class="text-sm text-red-400">{{ $message }}</div>
-            @enderror
+            @if($retryAfter > 0)
+                @include('partials.pin-cooldown')
+            @else
+                @error('pin')
+                    <div class="text-sm text-red-400">{{ $message }}</div>
+                @enderror
+            @endif
 
             <button
                 type="submit"
-                class="w-full rounded-2xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-600 transition">
+                @disabled($retryAfter > 0)
+                class="w-full rounded-2xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
                 Войти
             </button>
 

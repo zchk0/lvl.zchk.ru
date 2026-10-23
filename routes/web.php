@@ -2,6 +2,7 @@
 
 use App\Models\Board;
 use App\Models\Goal;
+use App\Services\PinLoginLimiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,11 +20,15 @@ Route::get('/share/{token}', function (string $token) {
     ]);
 })->where('token', '[A-Za-z0-9]+')->name('goals.share');
 
-Route::get('/pin', function () {
-    return view('pin');
+Route::get('/pin', function (Request $request, PinLoginLimiter $limiter) {
+    return view('pin', ['retryAfter' => $limiter->retryAfter($request)]);
 })->name('pin.form');
 
-Route::post('/pin/check', function (Request $request) {
+Route::post('/pin/check', function (Request $request, PinLoginLimiter $limiter) {
+    if ($limiter->retryAfter($request) > 0) {
+        return redirect()->route('pin.form');
+    }
+
     $request->validate([
         'pin' => ['required', 'string'],
     ]);
@@ -33,11 +38,16 @@ Route::post('/pin/check', function (Request $request) {
         ->first();
 
     if (! $board) {
+        if ($limiter->recordFailure($request) > 0) {
+            return redirect()->route('pin.form');
+        }
+
         return back()
             ->withErrors(['pin' => 'Неверный PIN-код'])
             ->withInput();
     }
 
+    $limiter->clearFailures($request);
     $request->session()->put('board_id', $board->id);
 
     return redirect()->intended('/');
@@ -49,22 +59,31 @@ Route::post('/pin/logout', function (Request $request) {
     return redirect()->route('pin.form');
 })->name('pin.logout');
 
-Route::get('/admin/login', function () {
-    return view('admin-login');
+Route::get('/admin/login', function (Request $request, PinLoginLimiter $limiter) {
+    return view('admin-login', ['retryAfter' => $limiter->retryAfter($request, 'admin')]);
 })->name('admin.login');
 
-Route::post('/admin/login', function (Request $request) {
+Route::post('/admin/login', function (Request $request, PinLoginLimiter $limiter) {
+    if ($limiter->retryAfter($request, 'admin') > 0) {
+        return redirect()->route('admin.login');
+    }
+
     $request->validate([
         'pin' => ['required', 'string'],
     ]);
 
     $adminPin = env('ADMIN_PIN_CODE', env('PIN_CODE', '1011'));
     if ($request->input('pin') !== $adminPin) {
+        if ($limiter->recordFailure($request, 'admin') > 0) {
+            return redirect()->route('admin.login');
+        }
+
         return back()
             ->withErrors(['pin' => 'Неверный PIN администратора'])
             ->withInput();
     }
 
+    $limiter->clearFailures($request, 'admin');
     $request->session()->put('admin_ok', true);
 
     return redirect()->route('admin.boards');

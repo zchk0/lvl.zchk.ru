@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>PIN-код</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ asset('js/pin-cooldown.js') }}" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body class="min-h-screen flex items-center justify-center bg-slate-900">
@@ -41,17 +42,22 @@
                      rounded-2xl border border-slate-600 bg-slate-900/60 
                      text-white outline-none focus:border-indigo-500 
                      focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0
-                     transition-all"
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              @disabled($retryAfter > 0)
               data-pin-input
             />
           @endfor
         </div>
 
-        @error('pin')
-          <div class="text-center text-xs sm:text-sm text-red-400">
-            {{ $message }}
-          </div>
-        @enderror
+        @if($retryAfter > 0)
+          @include('partials.pin-cooldown')
+        @else
+          @error('pin')
+            <div class="text-center text-xs sm:text-sm text-red-400">
+              {{ $message }}
+            </div>
+          @enderror
+        @endif
 
         <button
           type="submit"
@@ -94,7 +100,7 @@
 
       function updateSubmitState() {
         const allFilled = Array.from(inputs).every((input) => input.value.trim() !== "");
-        submitButton.disabled = !allFilled;
+        submitButton.disabled = !allFilled || !!document.querySelector('[data-pin-cooldown]');
       }
 
       inputs.forEach((input, index) => {
@@ -137,6 +143,11 @@
       });
 
       form.addEventListener("submit", (e) => {
+        if (document.querySelector('[data-pin-cooldown]')) {
+          e.preventDefault();
+          return;
+        }
+
         // НЕ отменяем отправку, просто подготавливаем поле pin
         const pin = Array.from(inputs)
           .map((input) => input.value)

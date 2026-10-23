@@ -31,7 +31,7 @@
                         wire:click="openBoardSettings"
                         aria-label="Настройки текущей доски"
                         title="Настройки доски"
-                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60">
+                        class="inline-flex h-9 w-9 shrink-0 translate-y-0.5 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/60">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                             <path stroke-linejoin="round" d="M9.13 5.07 10.26 2.15h3.48l1.13 2.92 2.87-1.26 2.45 2.45-1.26 2.87 2.92 1.13v3.48l-2.92 1.13 1.26 2.87-2.45 2.45-2.87-1.26-1.13 2.92h-3.48l-1.13-2.92-2.87 1.26-2.45-2.45 1.26-2.87-2.92-1.13v-3.48l2.92-1.13-1.26-2.87 2.45-2.45Z" />
                             <circle cx="12" cy="12" r="3.25" />

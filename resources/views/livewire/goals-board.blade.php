@@ -24,7 +24,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-2xl sm:text-3xl font-semibold">
-                        Цели v0.63
+                        Цели v0.64
                     </h1>
                     <button
                         type="button"

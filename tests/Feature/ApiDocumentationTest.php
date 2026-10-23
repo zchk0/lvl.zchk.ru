@@ -20,6 +20,8 @@ class ApiDocumentationTest extends TestCase
             ->assertOk()
             ->assertSee('Документация API')
             ->assertSee('/api/goals')
+            ->assertSee('Изменение цели')
+            ->assertSee('PATCH')
             ->assertSee('API_KEY')
             ->assertDontSee($board->api_key)
             ->assertDontSee($board->api_key_hash);
@@ -41,5 +43,31 @@ class ApiDocumentationTest extends TestCase
             ->assertJsonPath('data.tags', $payload['tags'])
             ->assertJsonPath('data.description_format', $payload['description_format'])
             ->assertJsonPath('data.target_amount', $payload['target_amount']);
+    }
+
+    public function test_the_documented_partial_update_preserves_other_fields(): void
+    {
+        $html = $this->get(route('api.docs'))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $document->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $xpath = new DOMXPath($document);
+        $createCode = $xpath->query('//*[@id="request-body-example"]//code')->item(0);
+        $updateCode = $xpath->query('//*[@id="update-request-body-example"]//code')->item(0);
+        $this->assertNotNull($createCode);
+        $this->assertNotNull($updateCode);
+        $createPayload = json_decode($createCode->textContent, true, flags: JSON_THROW_ON_ERROR);
+        $updatePayload = json_decode($updateCode->textContent, true, flags: JSON_THROW_ON_ERROR);
+        $board = Board::query()->firstOrFail();
+        $id = $this->withToken($board->api_key)->postJson('/api/goals', $createPayload)->assertCreated()->json('data.id');
+
+        $this->patchJson('/api/goals/'.$id, $updatePayload)
+            ->assertOk()
+            ->assertJsonPath('data.id', $id)
+            ->assertJsonPath('data.title', $updatePayload['title'])
+            ->assertJsonPath('data.tags', $updatePayload['tags'])
+            ->assertJsonPath('data.saved_amount', $updatePayload['saved_amount'])
+            ->assertJsonPath('data.description', $createPayload['description'])
+            ->assertJsonPath('data.target_amount', $createPayload['target_amount'])
+            ->assertJsonPath('data.priority', $createPayload['priority']);
     }
 }

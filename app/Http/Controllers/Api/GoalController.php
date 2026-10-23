@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\CreateGoal;
+use App\Actions\UpdateGoal;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGoalRequest;
+use App\Http\Requests\UpdateGoalRequest;
 use App\Http\Resources\GoalResource;
 use App\Models\Goal;
 use Illuminate\Http\JsonResponse;
@@ -28,5 +30,26 @@ class GoalController extends Controller
         ]);
 
         return (new GoalResource($goal))->response()->setStatusCode(201);
+    }
+
+    public function update(UpdateGoalRequest $request, string $goal, UpdateGoal $updateGoal): JsonResponse
+    {
+        $data = $request->validated();
+
+        if (array_key_exists('tags', $data)) {
+            $tags = Goal::parseAuthorTags(implode(', ', $data['tags']));
+            $data['author_name'] = $tags ? implode(', ', $tags) : null;
+            unset($data['tags']);
+        }
+
+        foreach (['target_amount', 'saved_amount'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] ??= 0;
+            }
+        }
+
+        $updated = $updateGoal->handle($request->attributes->get('api_board')->id, $goal, $data);
+
+        return (new GoalResource($updated))->response();
     }
 }

@@ -30,22 +30,26 @@
                         </h2>
                     </div>
 
-                    @if($viewingGoal->author_tags)
-                        <div class="mb-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
-                            <span class="text-slate-400">Автор:</span>
-                            @foreach($viewingGoal->author_tags as $tag)
-                                <span class="inline-flex max-w-full items-baseline gap-0.5 text-xs leading-4 text-slate-400">
-                                    <span aria-hidden="true" class="shrink-0 text-slate-500">#</span>
-                                    <span class="min-w-0 break-all">{{ $tag }}</span>
-                                </span>
-                            @endforeach
+                    @if($viewingGoal->author_tags || $viewingGoal->created_at)
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                            @if($viewingGoal->author_tags)
+                                <div class="flex max-w-full flex-wrap gap-1.5" role="group" aria-label="Авторы">
+                                    @foreach($viewingGoal->author_tags as $tag)
+                                        <span class="inline-flex max-w-full items-baseline gap-1 rounded-lg border border-slate-500/25 bg-slate-700/40 px-2.5 py-1 text-xs font-medium leading-4 text-slate-200">
+                                            <span aria-hidden="true" class="shrink-0 text-slate-400">#</span>
+                                            <span class="min-w-0 break-all">{{ $tag }}</span>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                            @if($viewingGoal->created_at)
+                                <time datetime="{{ $viewingGoal->created_at->toIso8601String() }}" class="text-xs leading-5 text-slate-400">
+                                    {{ $viewingGoal->created_at->format('d.m.Y') }}
+                                    <span class="text-slate-500">({{ (int) $viewingGoal->created_at->diffInDays(now()) }} дн. назад)</span>
+                                </time>
+                            @endif
                         </div>
                     @endif
-                    <p class="text-sm text-slate-400 italic">
-                        @if($viewingGoal->created_at)
-                            {{ $viewingGoal->created_at->format('d.m.Y') }} ({{ (int) $viewingGoal->created_at->diffInDays(now()) }} дн. назад)
-                        @endif
-                    </p>
 
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         @if($viewingGoal->is_completed)

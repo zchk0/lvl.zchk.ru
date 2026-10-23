@@ -20,6 +20,7 @@
 <body class="bg-slate-900">
     @livewire('goals-board')
 
+    <script src="{{ asset('js/author-tags.js') }}"></script>
     @livewireScripts
     <script src="{{ asset('js/modal-scroll-lock.js') }}" defer></script>
     <script src="{{ asset('js/goal-dnd.js') }}" defer></script>

@@ -309,13 +309,72 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm mb-1">Автор</label>
-                    <input
-                        placeholder="Кто?"
-                        type="text"
-                        wire:model.defer="author_name"
-                        class="w-full rounded-2xl bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                <div
+                    x-data="goalAuthorTags($wire.entangle('author_name'), $wire.entangle('authorTagInput'), @js($availableAuthorTags))"
+                    x-on:click.outside="open = false"
+                    x-on:focusout="if (!$el.contains($event.relatedTarget)) open = false"
+                    wire:key="author-tags-{{ $editingId ?? 'new' }}">
+                    <label for="goal-author-tag" class="block text-sm mb-1">Автор</label>
+                    <div
+                        x-on:click="$refs.authorInput.focus()"
+                        class="flex min-h-[42px] flex-wrap items-center gap-2 rounded-2xl border bg-slate-900 px-3 py-2 focus-within:ring-1
+                            @error('author_name') border-red-500 focus-within:ring-red-500 @else border-slate-600 focus-within:border-indigo-500 focus-within:ring-indigo-500 @enderror">
+                        <template x-for="(tag, index) in tags" :key="tag">
+                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-full border border-indigo-400/30 bg-indigo-500/15 pl-2.5 pr-1 py-0.5 text-xs text-indigo-200">
+                                <span class="break-all" x-text="tag"></span>
+                                <button
+                                    type="button"
+                                    x-on:click.stop="remove(index); $refs.authorInput.focus()"
+                                    :aria-label="'Удалить тег ' + tag"
+                                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-indigo-300 hover:bg-indigo-400/20 hover:text-white">&times;</button>
+                            </span>
+                        </template>
+                        <input
+                            id="goal-author-tag"
+                            x-ref="authorInput"
+                            x-model="input"
+                            x-on:input="open = true; activeIndex = -1; if (/[,;\r\n]/.test(input)) add()"
+                            x-on:focus="open = true; activeIndex = -1"
+                            x-on:click="open = true"
+                            x-on:keydown="keydown($event)"
+                            type="text"
+                            role="combobox"
+                            aria-autocomplete="list"
+                            aria-controls="goal-author-suggestions"
+                            aria-describedby="goal-author-help"
+                            :aria-expanded="open && suggestions.length > 0"
+                            :aria-activedescendant="open && activeIndex >= 0 ? 'goal-author-option-' + activeIndex : null"
+                            :placeholder="tags.length ? 'Ещё автор…' : 'Введите или выберите автора…'"
+                            autocomplete="off"
+                            class="min-w-[140px] flex-1 bg-transparent py-0.5 text-sm outline-none placeholder:text-slate-500">
+                    </div>
+                    <div
+                        id="goal-author-suggestions"
+                        x-ref="suggestions"
+                        x-show="open && suggestions.length > 0"
+                        style="display: none;"
+                        role="listbox"
+                        aria-label="Ранее введённые авторы"
+                        class="mt-2 max-h-40 overflow-y-auto rounded-xl border border-slate-600 bg-slate-900 p-1 shadow-lg">
+                        <template x-for="(tag, index) in suggestions" :key="tag">
+                            <button
+                                type="button"
+                                role="option"
+                                tabindex="-1"
+                                :id="'goal-author-option-' + index"
+                                :aria-selected="activeIndex === index"
+                                x-on:mousedown.prevent
+                                x-on:click="add(tag); $refs.authorInput.focus()"
+                                :class="activeIndex === index ? 'bg-indigo-500/20 text-indigo-100' : 'text-slate-300 hover:bg-slate-800'"
+                                class="block w-full rounded-lg px-3 py-2 text-left text-sm break-words">
+                                <span class="inline-block rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-xs text-indigo-200" x-text="tag"></span>
+                            </button>
+                        </template>
+                    </div>
+                    <p id="goal-author-help" class="mt-1.5 text-xs text-slate-500">Выберите подсказку или добавьте тег клавишей Enter или запятой.</p>
+                    @error('author_name')
+                    <div class="text-xs text-red-400 mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="flex gap-3 mt-4 justify-end">

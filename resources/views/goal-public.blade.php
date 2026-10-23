@@ -106,6 +106,10 @@
         }
 
         .author {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
             color: var(--muted);
             font-size: 14px;
             margin: 0 0 16px;
@@ -505,8 +509,13 @@
         <section class="hero">
             <span class="badge">Публичная карточка</span>
             <h1>{{ $goal->title }}</h1>
-            @if($goal->author_name)
-                <p class="author">Автор: {{ $goal->author_name }}</p>
+            @if($goal->author_tags)
+                <div class="author">
+                    <span>Автор:</span>
+                    @foreach($goal->author_tags as $tag)
+                        <span class="chip" style="overflow-wrap: anywhere;">{{ $tag }}</span>
+                    @endforeach
+                </div>
             @endif
             <div class="chips">
                 <span class="chip {{ $goal->is_completed ? 'chip-done' : 'chip-progress' }}">

@@ -14,9 +14,11 @@ $dragEnabled = $dragEnabled ?? true;
                 class="font-semibold text-slate-100 text-base leading-[1.4rem] {{ $goal->is_completed ? 'line-through text-slate-400' : '' }} text-left hover:text-indigo-300 transition cursor-pointer">
                 {{ $goal->title }}
             </button>
-            @if($goal->author_name)
-            <div class="text-xs text-slate-400 italic">
-                {{ $goal->author_name }}
+            @if($goal->author_tags)
+            <div class="mt-1 flex flex-wrap gap-1.5">
+                @foreach($goal->author_tags as $tag)
+                    <span class="max-w-full break-all rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2 py-0.5 text-xs text-indigo-200">{{ $tag }}</span>
+                @endforeach
             </div>
             @endif
         </div>

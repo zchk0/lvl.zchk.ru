@@ -39,6 +39,7 @@ class GoalsBoard extends Component
     public string $description_format = 'raw';
     public string $url = '';
     public string $author_name = '';
+    public string $authorTagInput = '';
     public string $target_amount = '';
     public string $saved_amount = '';
     public int $priority = 2;
@@ -48,6 +49,10 @@ class GoalsBoard extends Component
     {
         $boardId = $this->currentBoardId();
         $currentBoard = Board::findOrFail($boardId);
+        $term = trim($this->search);
+        $authorNames = $this->showModal || $term !== ''
+            ? Goal::where('board_id', $boardId)->whereNotNull('author_name')->distinct()->pluck('author_name')
+            : collect();
         $query = Goal::query()
             ->where('board_id', $boardId)
             ->orderBy('priority')
@@ -64,12 +69,16 @@ class GoalsBoard extends Component
         }
 
         // Поиск по карточкам
-        $term = trim($this->search);
         if ($term !== '' && (mb_strlen($term) > 0)) {
             $like = '%' . mb_strtolower($term) . '%';
-            $query->where(function ($q) use ($like) {
+            // PHP handles Cyrillic case folding even when SQLite's LOWER only handles ASCII.
+            $matchingAuthors = $authorNames
+                ->filter(static fn (string $authors): bool => mb_stripos($authors, $term) !== false)
+                ->values()->all();
+            $query->where(function ($q) use ($like, $matchingAuthors) {
                 $q->whereRaw('LOWER(title) LIKE ?', [$like])
-                    ->orWhereRaw('description LIKE ?', [$like]);
+                    ->orWhereRaw('description LIKE ?', [$like])
+                    ->orWhereIn('author_name', $matchingAuthors);
             });
         }
 
@@ -81,6 +90,12 @@ class GoalsBoard extends Component
             'lowGoals' => $goals[3] ?? collect(),
             'archive' => $goals[4] ?? collect(),
             'currentBoard' => $currentBoard,
+            'availableAuthorTags' => $this->showModal
+                ? $authorNames->flatMap(fn (string $authors) => Goal::parseAuthorTags($authors))
+                    ->unique(fn (string $tag) => mb_strtolower($tag))
+                    ->sortBy(fn (string $tag) => mb_strtolower($tag), SORT_NATURAL)
+                    ->values()->all()
+                : [],
         ]);
     }
 
@@ -118,6 +133,7 @@ class GoalsBoard extends Component
             : 'raw';
         $this->url = $goal->url ?? '';
         $this->author_name = (string) $goal->author_name;
+        $this->authorTagInput = '';
         $this->target_amount = (string) $goal->target_amount;
         $this->saved_amount = (string) $goal->saved_amount;
         $this->priority = (int) $goal->priority;
@@ -128,6 +144,9 @@ class GoalsBoard extends Component
 
     public function save(): void
     {
+        $this->author_name = implode(', ', Goal::parseAuthorTags($this->author_name . ',' . $this->authorTagInput));
+        $this->authorTagInput = '';
+
         $this->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -138,6 +157,8 @@ class GoalsBoard extends Component
             'saved_amount' => ['nullable', 'numeric', 'min:0'],
             'priority' => ['required', 'integer', 'in:1,2,3,4'],
             'is_completed' => ['boolean'],
+        ], [
+            'author_name.max' => 'Общая длина тегов автора не должна превышать 255 символов.',
         ]);
 
         $data = [
@@ -612,6 +633,7 @@ class GoalsBoard extends Component
         $this->description_format = 'raw';
         $this->url = '';
         $this->author_name = '';
+        $this->authorTagInput = '';
         $this->target_amount = '';
         $this->saved_amount = '';
         $this->priority = 2;

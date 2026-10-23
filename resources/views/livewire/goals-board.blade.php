@@ -23,7 +23,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-semibold">
-                    Цели v0.58
+                    Цели v0.59
                 </h1>
                 <div class="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
                     <span>{{ $currentBoard->name }}</span>
@@ -42,7 +42,7 @@
                     <input
                         type="search"
                         wire:model.live.debounce.300ms="search"
-                        placeholder="Поиск по целям…"
+                        placeholder="Поиск по целям и тегам…"
                         class="w-full rounded-2xl bg-slate-800 border border-slate-600 pl-3 pr-10 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
                         [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden" />
                     @if(trim($search) !== '')

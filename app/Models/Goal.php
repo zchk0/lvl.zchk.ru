@@ -39,6 +39,26 @@ class Goal extends Model
         'position' => 'integer',
     ];
 
+    public static function parseAuthorTags(?string $value): array
+    {
+        $tags = [];
+
+        foreach (preg_split('/[,;\r\n]+/u', $value ?? '') ?: [] as $tag) {
+            $tag = trim((string) preg_replace('/\s+/u', ' ', $tag));
+
+            if ($tag !== '') {
+                $tags[mb_strtolower($tag)] ??= $tag;
+            }
+        }
+
+        return array_values($tags);
+    }
+
+    public function getAuthorTagsAttribute(): array
+    {
+        return self::parseAuthorTags($this->author_name);
+    }
+
     // Акцессор прогресса в процентах
     public function getProgressPercentAttribute(): int
     {

@@ -30,10 +30,15 @@
                         </h2>
                     </div>
 
+                    @if($viewingGoal->author_tags)
+                        <div class="mb-2 flex flex-wrap items-center gap-1.5 text-xs">
+                            <span class="text-slate-400">Автор:</span>
+                            @foreach($viewingGoal->author_tags as $tag)
+                                <span class="max-w-full break-all rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-indigo-200">{{ $tag }}</span>
+                            @endforeach
+                        </div>
+                    @endif
                     <p class="text-sm text-slate-400 italic">
-                        @if($viewingGoal->author_name)
-                            <span>Автор: {{ $viewingGoal->author_name }} | </span>
-                        @endif
                         @if($viewingGoal->created_at)
                             {{ $viewingGoal->created_at->format('d.m.Y') }} ({{ (int) $viewingGoal->created_at->diffInDays(now()) }} дн. назад)
                         @endif

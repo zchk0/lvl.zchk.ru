@@ -7,6 +7,7 @@
     <meta name="description" content="{{ $goal->title }}">
     <link rel="icon" href="https://lvl.zchk.ru/favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/goal-description-table.css') }}">
     <style>
         :root {
             --bg-1: #0b0f1f;
@@ -166,6 +167,7 @@
         }
 
         .panel {
+            min-width: 0;
             padding: 26px 30px;
             border-radius: 24px;
             background: rgba(12, 18, 30, 0.7);
@@ -530,9 +532,7 @@
                 <h2>Описание</h2>
                 <div class="description-content">
                     @if($descriptionFormat === 'markdown')
-                        {!! Illuminate\Support\Str::markdown($goal->description, [
-                            'renderer' => ['soft_break' => "<br>\n"],
-                        ]) !!}
+                        @include('partials.goal-description-markdown', ['description' => $goal->description])
                     @elseif($descriptionFormat === 'html')
                         {!! $goal->description !!}
                     @else
